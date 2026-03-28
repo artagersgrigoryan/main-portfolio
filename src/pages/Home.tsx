@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ProjectCard from '../components/ProjectCard';
 import MarqueeBar from '../components/MarqueeBar';
+import { Link } from 'react-router-dom';
 import { useCaseStudies } from '../hooks/useSupabaseData';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -164,13 +165,12 @@ export default function Home() {
               Let's talk.
             </h3>
           </div>
-          <a
-            href="/contact"
-            onClick={(e) => { e.preventDefault(); window.location.href = '/contact'; }}
+          <Link
+            to="/contact"
             className="btn-brutal-filled border-white text-white hover:bg-white hover:text-[#0a0a0a] font-mono text-sm py-4 px-8 whitespace-nowrap"
           >
             Get In Touch →
-          </a>
+          </Link>
         </div>
       </section>
     </main>

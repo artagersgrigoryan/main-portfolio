@@ -50,13 +50,12 @@ export default function Navbar() {
               </Link>
             );
           })}
-          <a
-            href="/contact"
-            onClick={(e) => { e.preventDefault(); window.location.href = '/contact'; }}
+          <Link
+            to="/contact"
             className="flex items-center px-6 border-l-2 border-[#0a0a0a] bg-[#0a0a0a] text-white font-mono text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-[#0a0a0a] transition-colors"
           >
             Hire Me →
-          </a>
+          </Link>
         </nav>
 
         {/* Mobile hamburger */}
