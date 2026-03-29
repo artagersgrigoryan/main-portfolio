@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import SmoothScroll, { useLenis } from './components/SmoothScroll';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -11,9 +12,14 @@ import Admin from './pages/Admin';
 // Scroll to top on route change
 function ScrollReset() {
   const location = useLocation();
+  const lenis = useLenis();
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [location.pathname]);
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [location.pathname, lenis]);
   return null;
 }
 
@@ -41,7 +47,9 @@ function Layout() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Layout />
+      <SmoothScroll>
+        <Layout />
+      </SmoothScroll>
       <SpeedInsights />
     </BrowserRouter>
   );

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 @theme {
   --font-sans: 'Space Grotesk', sans-serif;
@@ -10,7 +11,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior removed — Lenis handles smooth scrolling */
 }
 
 body {
@@ -30,12 +31,15 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #f0f0f0;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #0a0a0a;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #333;
 }
@@ -106,8 +110,13 @@ body {
 
 /* Marquee animation */
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .marquee-inner {
@@ -123,7 +132,27 @@ body {
 }
 
 /* Admin form focus styles */
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: 2px solid #0a0a0a;
   outline-offset: 0;
+}
+
+/* ── Accessibility: disable animations for reduced-motion users ──────────── */
+@media (prefers-reduced-motion: reduce) {
+  .gsap-hidden {
+    opacity: 1;
+    transform: none;
+  }
+
+  .marquee-inner {
+    animation: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

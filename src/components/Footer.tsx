@@ -18,7 +18,7 @@ export default function Footer() {
         {/* Center */}
         <div className="flex items-center px-6 py-6 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
           <span className="font-mono text-xs text-[#999] uppercase tracking-widest">
-            Built with Figma → Code
+            Built by me → Vibe Coding
           </span>
         </div>
 

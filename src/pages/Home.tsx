@@ -16,40 +16,55 @@ export default function Home() {
   const metaRef = useRef<HTMLDivElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
 
+  // ── Hero entrance ────────────────────────────────────────────────────
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
     tl.fromTo(headingRef.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
       .fromTo(subRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.5')
       .fromTo(metaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, '-=0.3');
-
     return () => { tl.kill(); };
   }, []);
 
+  // ── Bidirectional scroll animations for project cards ─────────────────
   useEffect(() => {
     if (loading || !projectsRef.current) return;
 
     const cards = projectsRef.current.querySelectorAll('.project-card-wrapper');
+    const triggers: ScrollTrigger[] = [];
+
+    // Set initial hidden state to prevent flash before ScrollTrigger fires
+    gsap.set(cards, { opacity: 0, y: 60, scale: 0.97 });
+
     cards.forEach((card) => {
-      gsap.fromTo(
-        card,
-        { opacity: 0, y: 60 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 85%',
-            once: true,
-          },
-        }
-      );
+      // ── Enter animation (from bottom) ──
+      const enterTrigger = ScrollTrigger.create({
+        trigger: card,
+        start: 'top 92%',
+        end: 'bottom 8%',
+        onEnter: () => gsap.fromTo(card,
+          { y: 60, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.75, ease: 'power3.out' }
+        ),
+        // ── Exit animation (out the top) ──
+        onLeave: () => gsap.to(card,
+          { y: -40, opacity: 0, scale: 0.97, duration: 0.5, ease: 'power2.in' }
+        ),
+        // ── Re-enter from top (scrolling back down) ──
+        onEnterBack: () => gsap.fromTo(card,
+          { y: -40, opacity: 0, scale: 0.97 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' }
+        ),
+        // ── Exit bottom (scrolling back up past it) ──
+        onLeaveBack: () => gsap.to(card,
+          { y: 60, opacity: 0, scale: 0.97, duration: 0.5, ease: 'power2.in' }
+        ),
+      });
+      triggers.push(enterTrigger);
     });
 
-    return () => { ScrollTrigger.getAll().forEach(t => t.kill()); };
-  }, [loading]);
+    return () => { triggers.forEach(t => t.kill()); };
+  }, [loading, projects]);
+
 
   return (
     <main className="pt-14">

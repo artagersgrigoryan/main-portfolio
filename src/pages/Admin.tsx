@@ -30,6 +30,7 @@ function CaseStudiesAdmin() {
   const [editing, setEditing] = useState<Partial<CaseStudy> | null>(null);
   const [saving, setSaving] = useState(false);
   const [banner, setBanner] = useState<{ msg: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
 
   const showBanner = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setBanner({ msg, type });
@@ -62,10 +63,10 @@ function CaseStudiesAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this case study?')) return;
-    if (!isConfigured()) { showBanner('Supabase not configured.', 'info'); return; }
+    if (!isConfigured()) { showBanner('Supabase not configured.', 'info'); setConfirmingDelete(null); return; }
     await supabase.from('case_studies').delete().eq('id', id);
     showBanner('Deleted!');
+    setConfirmingDelete(null);
     refetch();
   };
 
@@ -163,8 +164,17 @@ function CaseStudiesAdmin() {
 
             {/* Actions */}
             <div className="flex gap-2 shrink-0">
-              <button onClick={() => setEditing(item)} className="btn-brutal text-xs py-1.5 px-3">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="font-mono text-xs border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-1.5 px-3 transition-colors">Del</button>
+              {confirmingDelete === item.id ? (
+                <div className="flex gap-1 animate-in fade-in slide-in-from-right-2 duration-200">
+                  <button onClick={() => handleDelete(item.id)} className="font-mono text-[10px] bg-red-500 text-white border-2 border-red-500 py-1.5 px-3 uppercase font-bold">Confirm</button>
+                  <button onClick={() => setConfirmingDelete(null)} className="font-mono text-[10px] border-2 border-[#0a0a0a] py-1.5 px-3 uppercase">Cancel</button>
+                </div>
+              ) : (
+                <>
+                  <button onClick={() => setEditing(item)} className="btn-brutal text-xs py-1.5 px-3">Edit</button>
+                  <button onClick={() => setConfirmingDelete(item.id)} className="font-mono text-xs border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-1.5 px-3 transition-colors">Del</button>
+                </>
+              )}
             </div>
           </div>
         ))
@@ -179,6 +189,7 @@ function ExperienceAdmin() {
   const [editing, setEditing] = useState<Partial<WorkExperience> | null>(null);
   const [saving, setSaving] = useState(false);
   const [banner, setBanner] = useState<{ msg: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
 
   const showBanner = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setBanner({ msg, type });
@@ -210,10 +221,10 @@ function ExperienceAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this role?')) return;
-    if (!isConfigured()) { showBanner('Supabase not configured.', 'info'); return; }
+    if (!isConfigured()) { showBanner('Supabase not configured.', 'info'); setConfirmingDelete(null); return; }
     await supabase.from('work_experience').delete().eq('id', id);
     showBanner('Deleted!');
+    setConfirmingDelete(null);
     refetch();
   };
 
@@ -277,8 +288,17 @@ function ExperienceAdmin() {
               <p className="font-mono text-xs text-[#555] mt-2 line-clamp-2">{item.description}</p>
             </div>
             <div className="flex gap-2 shrink-0">
-              <button onClick={() => setEditing(item)} className="btn-brutal text-xs py-1.5 px-3">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="font-mono text-xs border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-1.5 px-3 transition-colors">Del</button>
+              {confirmingDelete === item.id ? (
+                <div className="flex gap-1 animate-in fade-in slide-in-from-right-2 duration-200">
+                  <button onClick={() => handleDelete(item.id)} className="font-mono text-[10px] bg-red-500 text-white border-2 border-red-500 py-1.5 px-3 uppercase font-bold">Confirm</button>
+                  <button onClick={() => setConfirmingDelete(null)} className="font-mono text-[10px] border-2 border-[#0a0a0a] py-1.5 px-3 uppercase">Cancel</button>
+                </div>
+              ) : (
+                <>
+                  <button onClick={() => setEditing(item)} className="btn-brutal text-xs py-1.5 px-3">Edit</button>
+                  <button onClick={() => setConfirmingDelete(item.id)} className="font-mono text-xs border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-1.5 px-3 transition-colors">Del</button>
+                </>
+              )}
             </div>
           </div>
         ))
@@ -293,6 +313,7 @@ function ContactsAdmin() {
   const [editing, setEditing] = useState<Partial<ContactLink> | null>(null);
   const [saving, setSaving] = useState(false);
   const [banner, setBanner] = useState<{ msg: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
 
   const showBanner = (msg: string, type: 'success' | 'error' | 'info' = 'success') => {
     setBanner({ msg, type });
@@ -324,10 +345,10 @@ function ContactsAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Delete this contact link?')) return;
-    if (!isConfigured()) return;
+    if (!isConfigured()) { setConfirmingDelete(null); return; }
     await supabase.from('contact_links').delete().eq('id', id);
     showBanner('Deleted!');
+    setConfirmingDelete(null);
     refetch();
   };
 
@@ -401,8 +422,17 @@ function ContactsAdmin() {
               <p className="font-mono text-[10px] text-[#999] mt-0.5 truncate">{item.href}</p>
             </div>
             <div className="flex gap-2 shrink-0">
-              <button onClick={() => setEditing(item)} className="btn-brutal text-xs py-1.5 px-3">Edit</button>
-              <button onClick={() => handleDelete(item.id)} className="font-mono text-xs border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-1.5 px-3 transition-colors">Del</button>
+              {confirmingDelete === item.id ? (
+                <div className="flex gap-1 animate-in fade-in slide-in-from-right-2 duration-200">
+                  <button onClick={() => handleDelete(item.id)} className="font-mono text-[10px] bg-red-500 text-white border-2 border-red-500 py-1.5 px-3 uppercase font-bold">Confirm</button>
+                  <button onClick={() => setConfirmingDelete(null)} className="font-mono text-[10px] border-2 border-[#0a0a0a] py-1.5 px-3 uppercase">Cancel</button>
+                </div>
+              ) : (
+                <>
+                  <button onClick={() => setEditing(item)} className="btn-brutal text-xs py-1.5 px-3">Edit</button>
+                  <button onClick={() => setConfirmingDelete(item.id)} className="font-mono text-xs border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white py-1.5 px-3 transition-colors">Del</button>
+                </>
+              )}
             </div>
           </div>
         ))
