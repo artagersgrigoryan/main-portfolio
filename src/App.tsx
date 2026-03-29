@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import SmoothScroll, { useLenis } from './components/SmoothScroll';
 import Navbar from './components/Navbar';
@@ -50,6 +51,7 @@ export default function App() {
       <SmoothScroll>
         <Layout />
       </SmoothScroll>
+      <Analytics />
       <SpeedInsights />
     </BrowserRouter>
   );
