@@ -4,6 +4,8 @@ import { useContactLinks } from '../hooks/useSupabaseData';
 
 export default function Contact() {
   const { data: links } = useContactLinks();
+
+  useEffect(() => { document.title = 'Contact — Artagers Grigoryan'; }, []);
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
@@ -26,18 +28,21 @@ export default function Contact() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          message: formData.message.trim(),
+        }),
       });
 
       if (!response.ok) throw new Error('Server error');
 
       setStatus('sent');
       setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setStatus('idle'), 4000);
     } catch {
       setStatus('error');
-      setTimeout(() => setStatus('idle'), 4000);
     }
+    setTimeout(() => setStatus('idle'), 4000);
   };
 
   const getIcon = (type: string) => {

@@ -440,9 +440,9 @@ function ContactsAdmin() {
 
 // ─── Reusable Field ───────────────────────────────────────────────────────────
 function AdminField({
-  label, value, onChange, multiline = false, type = 'text',
+  label, value, onChange, multiline = false, type = 'text', placeholder, autoFocus,
 }: {
-  label: string; value: string; onChange: (v: string) => void; multiline?: boolean; type?: string;
+  label: string; value: string; onChange: (v: string) => void; multiline?: boolean; type?: string; placeholder?: string; autoFocus?: boolean;
 }) {
   return (
     <div className="border-2 border-[#0a0a0a]">
@@ -452,6 +452,7 @@ function AdminField({
           value={value}
           onChange={e => onChange(e.target.value)}
           rows={4}
+          placeholder={placeholder}
           className="w-full px-3 py-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors resize-none"
         />
       ) : (
@@ -459,6 +460,8 @@ function AdminField({
           type={type}
           value={value}
           onChange={e => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoFocus={autoFocus}
           className="w-full px-3 py-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
         />
       )}
@@ -476,9 +479,26 @@ export default function Admin() {
   const [tab, setTab] = useState<AdminTab>('case_studies');
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setAuthed(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthed(!!session);
     });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    document.title = 'Admin';
+    let tag = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    const created = !tag;
+    if (created) {
+      tag = document.createElement('meta');
+      tag.setAttribute('name', 'robots');
+      document.head.appendChild(tag);
+    }
+    tag!.content = 'noindex, nofollow';
+    return () => {
+      if (created) tag!.remove();
+      else tag!.content = 'index, follow';
+    };
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -486,12 +506,7 @@ export default function Admin() {
     setLogging(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
     setLogging(false);
-    if (error) {
-      setPwError(true);
-    } else {
-      setAuthed(true);
-      setPwError(false);
-    }
+    if (error) setPwError(true);
   };
 
   const handleLogout = async () => {
@@ -507,27 +522,12 @@ export default function Admin() {
             <p className="font-mono text-xs uppercase tracking-widest">Admin Access</p>
           </div>
           <form onSubmit={handleLogin} className="p-6 space-y-4">
-            <div className="border-2 border-[#0a0a0a]">
-              <label className="block px-3 pt-3 label-mono">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => { setEmail(e.target.value); setPwError(false); }}
-                className="w-full px-3 py-2 font-mono text-sm bg-transparent"
-                placeholder="admin@example.com"
-                autoFocus
-              />
-            </div>
-            <div className="border-2 border-[#0a0a0a]">
-              <label className="block px-3 pt-3 label-mono">Password</label>
-              <input
-                type="password"
-                value={pw}
-                onChange={e => { setPw(e.target.value); setPwError(false); }}
-                className="w-full px-3 py-2 font-mono text-sm bg-transparent"
-                placeholder="Enter password"
-              />
-            </div>
+            <AdminField label="Email" value={email} type="email"
+              onChange={v => { setEmail(v); setPwError(false); }}
+              placeholder="admin@example.com" autoFocus />
+            <AdminField label="Password" value={pw} type="password"
+              onChange={v => { setPw(v); setPwError(false); }}
+              placeholder="Enter password" />
             {pwError && (
               <p className="font-mono text-xs text-red-600 uppercase tracking-widest">
                 Incorrect email or password.
