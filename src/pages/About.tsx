@@ -24,6 +24,7 @@ const HOBBIES = [
 ];
 
 export default function About() {
+  useEffect(() => { document.title = 'About — Artagers Grigoryan'; }, []);
   const { data: experience, loading } = useWorkExperience();
   const stickyImgRef = useRef<HTMLDivElement>(null);
   const bioRef = useRef<HTMLDivElement>(null);

@@ -11,6 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Home() {
   const { data: projects, loading } = useCaseStudies();
   const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { document.title = 'Artagers Grigoryan — Product Designer'; }, []);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
