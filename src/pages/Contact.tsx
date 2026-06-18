@@ -22,36 +22,19 @@ export default function Contact() {
     e.preventDefault();
     setStatus('sending');
 
-    const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-    const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
-
-    if (!botToken || !chatId || botToken.includes('YOUR_')) {
-      console.error('Telegram credentials are not configured in .env');
-      setStatus('error');
-      setTimeout(() => setStatus('idle'), 4000);
-      return;
-    }
-
-    const text = `📬 *New Contact Form Submission*\n\n*Name:* ${formData.name}\n*Email:* ${formData.email}\n*Message:*\n${formData.message}`;
-
     try {
-      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: text,
-          parse_mode: 'Markdown',
-        }),
+        body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error('Telegram API responded with an error');
+      if (!response.ok) throw new Error('Server error');
 
       setStatus('sent');
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setStatus('idle'), 4000);
-    } catch (error) {
-      console.error('Error sending message:', error);
+    } catch {
       setStatus('error');
       setTimeout(() => setStatus('idle'), 4000);
     }

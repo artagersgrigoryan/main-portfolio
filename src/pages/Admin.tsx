@@ -1,9 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase, type CaseStudy, type WorkExperience, type ContactLink } from '../lib/supabase';
 import { useCaseStudies, useWorkExperience, useContactLinks } from '../hooks/useSupabaseData';
-
-// ─── Admin Password Gate ──────────────────────────────────────────────────────
-const ADMIN_PASSWORD = ' '; // Change this!
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AdminTab = 'case_studies' | 'experience' | 'contacts';
@@ -472,18 +469,34 @@ function AdminField({
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 export default function Admin() {
   const [authed, setAuthed] = useState(false);
+  const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const [pwError, setPwError] = useState(false);
+  const [logging, setLogging] = useState(false);
   const [tab, setTab] = useState<AdminTab>('case_studies');
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setAuthed(true);
+    });
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pw === ADMIN_PASSWORD) {
+    setLogging(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    setLogging(false);
+    if (error) {
+      setPwError(true);
+    } else {
       setAuthed(true);
       setPwError(false);
-    } else {
-      setPwError(true);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuthed(false);
   };
 
   if (!authed) {
@@ -495,6 +508,17 @@ export default function Admin() {
           </div>
           <form onSubmit={handleLogin} className="p-6 space-y-4">
             <div className="border-2 border-[#0a0a0a]">
+              <label className="block px-3 pt-3 label-mono">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setPwError(false); }}
+                className="w-full px-3 py-2 font-mono text-sm bg-transparent"
+                placeholder="admin@example.com"
+                autoFocus
+              />
+            </div>
+            <div className="border-2 border-[#0a0a0a]">
               <label className="block px-3 pt-3 label-mono">Password</label>
               <input
                 type="password"
@@ -502,16 +526,15 @@ export default function Admin() {
                 onChange={e => { setPw(e.target.value); setPwError(false); }}
                 className="w-full px-3 py-2 font-mono text-sm bg-transparent"
                 placeholder="Enter password"
-                autoFocus
               />
             </div>
             {pwError && (
               <p className="font-mono text-xs text-red-600 uppercase tracking-widest">
-                Incorrect password.
+                Incorrect email or password.
               </p>
             )}
-            <button type="submit" className="btn-brutal-filled w-full py-3 text-sm">
-              Enter →
+            <button type="submit" disabled={logging} className="btn-brutal-filled w-full py-3 text-sm">
+              {logging ? 'Signing in...' : 'Enter →'}
             </button>
           </form>
         </div>
@@ -541,7 +564,7 @@ export default function Admin() {
               </span>
             )}
             <button
-              onClick={() => setAuthed(false)}
+              onClick={handleLogout}
               className="font-mono text-xs border border-[#444] text-[#888] hover:border-white hover:text-white px-3 py-1.5 transition-colors uppercase tracking-wider"
             >
               Logout
