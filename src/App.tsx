@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import CaseStudyFury from './pages/CaseStudyFury';
 
 // Scroll to top on route change
 function ScrollReset() {
@@ -36,6 +37,7 @@ function Layout() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/work/telegram-mini-app-games" element={<CaseStudyFury />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </div>

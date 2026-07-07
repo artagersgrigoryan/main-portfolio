@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import type { CaseStudy } from '../lib/supabase';
 
@@ -41,19 +42,10 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
 
   const isEven = index % 2 === 0;
 
-  return (
-    <div
-      ref={cardRef}
-      className="group border-2 border-[#0a0a0a] cursor-pointer"
-      style={{ borderTopWidth: index === 0 ? '2px' : '0' }}
-    >
-      <a
-        href={project.link !== '#' ? project.link : undefined}
-        target={project.link !== '#' ? '_blank' : undefined}
-        rel="noopener noreferrer"
-        className="block"
-        onClick={(e) => { if (project.link === '#') e.preventDefault(); }}
-      >
+  // Links starting with "/" are internal case pages; "http…" opens externally; "#" is inert.
+  const isInternal = project.link.startsWith('/');
+
+  const cardContent = (
         <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'}`}>
           {/* Image Block */}
           <div className="relative w-full lg:w-[55%] overflow-hidden bg-[#f0f0f0]" style={{ aspectRatio: '16/9' }}>
@@ -103,7 +95,29 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
             </div>
           </div>
         </div>
-      </a>
+  );
+
+  return (
+    <div
+      ref={cardRef}
+      className="group border-2 border-[#0a0a0a] cursor-pointer"
+      style={{ borderTopWidth: index === 0 ? '2px' : '0' }}
+    >
+      {isInternal ? (
+        <Link to={project.link} className="block">
+          {cardContent}
+        </Link>
+      ) : (
+        <a
+          href={project.link !== '#' ? project.link : undefined}
+          target={project.link !== '#' ? '_blank' : undefined}
+          rel="noopener noreferrer"
+          className="block"
+          onClick={(e) => { if (project.link === '#') e.preventDefault(); }}
+        >
+          {cardContent}
+        </a>
+      )}
     </div>
   );
 }

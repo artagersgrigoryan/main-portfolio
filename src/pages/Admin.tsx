@@ -107,7 +107,7 @@ function CaseStudiesAdmin() {
               <AdminField label="Title *" value={editing.title || ''} onChange={v => setEditing({ ...editing, title: v })} />
               <AdminField label="Description" value={editing.description || ''} onChange={v => setEditing({ ...editing, description: v })} multiline />
               <AdminField label="Image URL" value={editing.image_url || ''} onChange={v => setEditing({ ...editing, image_url: v })} />
-              <AdminField label="Project Link" value={editing.link || ''} onChange={v => setEditing({ ...editing, link: v })} />
+              <AdminField label="Project Link" value={editing.link || ''} onChange={v => setEditing({ ...editing, link: v })} placeholder="https://… (external) or /work/slug (internal case page)" />
               <AdminField
                 label="Tags (comma-separated)"
                 value={(editing.tags || []).join(', ')}
