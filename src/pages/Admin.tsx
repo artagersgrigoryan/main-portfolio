@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase, type CaseStudy, type WorkExperience, type ContactLink } from '../lib/supabase';
 import { useCaseStudies, useWorkExperience, useContactLinks } from '../hooks/useSupabaseData';
+import { uploadCover, fetchImageAsBlob, isStorageUrl } from '../lib/uploadImage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type AdminTab = 'case_studies' | 'experience' | 'contacts';
@@ -26,6 +27,7 @@ function CaseStudiesAdmin() {
   const { data, loading, refetch } = useCaseStudies();
   const [editing, setEditing] = useState<Partial<CaseStudy> | null>(null);
   const [saving, setSaving] = useState(false);
+  const [migrating, setMigrating] = useState(false);
   const [banner, setBanner] = useState<{ msg: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
 
@@ -78,19 +80,67 @@ function CaseStudiesAdmin() {
     refetch();
   };
 
+  // One-time move of covers that still live outside Storage (repo paths, external
+  // CDNs) into the bucket. Cross-origin hosts without CORS headers can't be read
+  // by the browser — those rows are reported by name so they can be re-uploaded
+  // by hand rather than silently skipped.
+  const migrateImages = async () => {
+    if (!isConfigured()) { showBanner('Supabase not configured.', 'info'); return; }
+    const pending = data.filter(d => d.image_url && !isStorageUrl(d.image_url));
+    if (!pending.length) { showBanner('All covers are already in Storage.', 'info'); return; }
+
+    setMigrating(true);
+    const failed: string[] = [];
+    let moved = 0;
+
+    for (const item of pending) {
+      try {
+        const blob = await fetchImageAsBlob(item.image_url);
+        const url = await uploadCover(blob, item.title);
+        const { error } = await supabase.from('case_studies').update({ image_url: url }).eq('id', item.id);
+        if (error) throw new Error(error.message);
+        moved++;
+      } catch {
+        failed.push(item.title);
+      }
+    }
+
+    setMigrating(false);
+    refetch();
+    if (failed.length) {
+      showBanner(`Moved ${moved}. Could not fetch: ${failed.join(', ')} — upload by hand.`, 'error');
+    } else {
+      showBanner(`Moved ${moved} cover${moved === 1 ? '' : 's'} to Storage.`);
+    }
+  };
+
+  const unmigrated = data.filter(d => d.image_url && !isStorageUrl(d.image_url)).length;
+
   return (
     <div>
       {banner && <Banner msg={banner.msg} type={banner.type} />}
 
       {/* Add new */}
-      <div className="px-6 py-4 border-b-2 border-[#0a0a0a] flex items-center justify-between">
+      <div className="px-6 py-4 border-b-2 border-[#0a0a0a] flex items-center justify-between gap-3 flex-wrap">
         <p className="label-mono">Case Studies ({data.length})</p>
-        <button
-          className="btn-brutal-filled text-xs py-2 px-4"
-          onClick={() => setEditing({ title: '', description: '', image_url: '', link: '#', tags: [], display_order: data.length + 1 })}
-        >
-          + Add New
-        </button>
+        <div className="flex items-center gap-2">
+          {unmigrated > 0 && (
+            <button
+              className="btn-brutal text-xs py-2 px-4 disabled:opacity-50"
+              onClick={migrateImages}
+              disabled={migrating}
+              title="Copy covers that still live in the repo or on an external CDN into Supabase Storage"
+            >
+              {migrating ? 'Migrating…' : `Migrate ${unmigrated} Image${unmigrated === 1 ? '' : 's'}`}
+            </button>
+          )}
+          <button
+            className="btn-brutal-filled text-xs py-2 px-4"
+            onClick={() => setEditing({ title: '', description: '', image_url: '', link: '#', tags: [], display_order: data.length + 1 })}
+          >
+            + Add New
+          </button>
+        </div>
       </div>
 
       {/* Edit modal */}
@@ -106,7 +156,11 @@ function CaseStudiesAdmin() {
             <div className="p-6 space-y-4">
               <AdminField label="Title *" value={editing.title || ''} onChange={v => setEditing({ ...editing, title: v })} />
               <AdminField label="Description" value={editing.description || ''} onChange={v => setEditing({ ...editing, description: v })} multiline />
-              <AdminField label="Image URL" value={editing.image_url || ''} onChange={v => setEditing({ ...editing, image_url: v })} />
+              <ImageField
+                value={editing.image_url || ''}
+                onChange={v => setEditing({ ...editing, image_url: v })}
+                onError={msg => showBanner(msg, 'error')}
+              />
               <AdminField label="Project Link" value={editing.link || ''} onChange={v => setEditing({ ...editing, link: v })} placeholder="https://… (external) or /work/slug (internal case page)" />
               <AdminField
                 label="Tags (comma-separated)"
@@ -465,6 +519,79 @@ function AdminField({
           className="w-full px-3 py-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
         />
       )}
+    </div>
+  );
+}
+
+// ─── Image Field ──────────────────────────────────────────────────────────────
+// Upload writes the resulting Storage URL into the text input, which stays
+// editable — external URLs and repo paths can still be pasted by hand.
+function ImageField({
+  value, onChange, onError,
+}: {
+  value: string; onChange: (v: string) => void; onError: (msg: string) => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [broken, setBroken] = useState(false);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow re-picking the same file
+    if (!file) return;
+    setUploading(true);
+    try {
+      onChange(await uploadCover(file, file.name));
+      setBroken(false);
+    } catch (err) {
+      onError('Upload failed: ' + (err instanceof Error ? err.message : String(err)));
+    }
+    setUploading(false);
+  };
+
+  return (
+    <div className="border-2 border-[#0a0a0a]">
+      <label className="block px-3 pt-3 label-mono">Cover Image</label>
+
+      <div className="flex items-center gap-3 px-3 pt-3">
+        {value && !broken ? (
+          <img
+            src={value}
+            alt=""
+            onError={() => setBroken(true)}
+            onLoad={() => setBroken(false)}
+            className="w-28 h-16 object-cover border border-[#ccc] shrink-0"
+          />
+        ) : (
+          <div className="w-28 h-16 border border-dashed border-[#ccc] shrink-0 flex items-center justify-center font-mono text-[9px] text-[#999] text-center px-1">
+            {broken ? 'BROKEN LINK' : 'NO IMAGE'}
+          </div>
+        )}
+
+        <div>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="btn-brutal text-xs py-2 px-4 disabled:opacity-50"
+          >
+            {uploading ? 'Uploading…' : value ? 'Replace Image' : 'Upload Image'}
+          </button>
+          <p className="font-mono text-[9px] text-[#999] mt-1.5">
+            Resized to 2000px wide, saved as JPEG
+          </p>
+        </div>
+
+        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
+      </div>
+
+      <input
+        type="text"
+        value={value}
+        onChange={e => { onChange(e.target.value); setBroken(false); }}
+        placeholder="…or paste an image URL"
+        className="w-full px-3 py-2 mt-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
+      />
     </div>
   );
 }
