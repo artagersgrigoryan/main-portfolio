@@ -23,6 +23,10 @@ export interface CaseStudy {
   tags: string[];
   display_order: number;
   created_at: string;
+  /** One-line defensible result, e.g. "16 interfaces, two weeks, zero revisions". */
+  outcome?: string | null;
+  /** What the link promises, so it reads as evidence: "Open on the App Store ↗". */
+  link_label?: string | null;
 }
 
 export interface WorkExperience {
@@ -62,6 +66,10 @@ CREATE TABLE case_studies (
   display_order INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration 2026-08-27: verification fields
+ALTER TABLE case_studies ADD COLUMN IF NOT EXISTS outcome TEXT;
+ALTER TABLE case_studies ADD COLUMN IF NOT EXISTS link_label TEXT;
 
 -- Work Experience table
 CREATE TABLE work_experience (

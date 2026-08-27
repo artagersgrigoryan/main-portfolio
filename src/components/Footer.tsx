@@ -4,7 +4,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
   return (
     <footer className="border-t-2 border-[#0a0a0a] bg-white mt-auto">
-      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-stretch">
+      <div className="site-shell flex flex-col md:flex-row items-stretch">
         {/* Left */}
         <div className="flex-1 px-6 py-6 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
           <p className="font-mono text-xs text-[#666] uppercase tracking-widest">
@@ -18,12 +18,18 @@ export default function Footer() {
         {/* Center */}
         <div className="flex items-center px-6 py-6 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
           <span className="font-mono text-xs text-[#999] uppercase tracking-widest">
-            Built by me → Vibe Coding
+            Designed and built by me
           </span>
         </div>
 
         {/* Right — Admin link (hidden, in footer) */}
         <div className="flex items-center px-6 py-6">
+          <Link
+            to="/hire"
+            className="font-mono text-xs text-[#666] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors mr-6"
+          >
+            For hiring teams
+          </Link>
           <Link
             to="/admin"
             className="font-mono text-xs text-[#ccc] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors"

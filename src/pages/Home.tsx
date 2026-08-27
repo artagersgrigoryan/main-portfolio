@@ -1,22 +1,39 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import ProjectCard from '../components/ProjectCard';
+import SelectedWork from '../components/SelectedWork';
 import MarqueeBar from '../components/MarqueeBar';
+import OfferTiers from '../components/OfferTiers';
+import ProcessSteps from '../components/ProcessSteps';
+import ToolPromo from '../components/ToolPromo';
 import { Link } from 'react-router-dom';
 import { useCaseStudies } from '../hooks/useSupabaseData';
+import { trackEvent } from '../lib/analytics';
+import { useLenis } from '../components/SmoothScroll';
+import { usePageMeta } from '../hooks/usePageMeta';
+
+/**
+ * Hand-edited. "Available for work" read as *unemployed* to a prospective
+ * client; capacity reads as demand. Not wired to Supabase — an admin field for
+ * one string is not worth the schema change.
+ */
+const CAPACITY = '2 project slots open';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const { data: projects, loading } = useCaseStudies();
   const heroRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
 
-  useEffect(() => { document.title = 'Artagers Grigoryan — Product Designer'; }, []);
+  usePageMeta({
+    title: 'Artagers Grigoryan — Product Designer for iGaming, Web3 & Dashboards',
+    description: 'Product designer who ships. iGaming, Web3 and data-heavy platforms — designed, and built when you need it live. Yerevan, Armenia.',
+    path: '/',
+  });
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
-  const projectsRef = useRef<HTMLDivElement>(null);
 
   // ── Hero entrance ────────────────────────────────────────────────────
   useEffect(() => {
@@ -27,52 +44,11 @@ export default function Home() {
     return () => { tl.kill(); };
   }, []);
 
-  // ── Bidirectional scroll animations for project cards ─────────────────
-  useEffect(() => {
-    if (loading || !projectsRef.current) return;
-
-    const cards = projectsRef.current.querySelectorAll('.project-card-wrapper');
-    const triggers: ScrollTrigger[] = [];
-
-    // Set initial hidden state to prevent flash before ScrollTrigger fires
-    gsap.set(cards, { opacity: 0, y: 60, scale: 0.97 });
-
-    cards.forEach((card) => {
-      // ── Enter animation (from bottom) ──
-      const enterTrigger = ScrollTrigger.create({
-        trigger: card,
-        start: 'top 92%',
-        end: 'bottom 8%',
-        onEnter: () => gsap.fromTo(card,
-          { y: 60, opacity: 0, scale: 0.97 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.75, ease: 'power3.out' }
-        ),
-        // ── Exit animation (out the top) ──
-        onLeave: () => gsap.to(card,
-          { y: -40, opacity: 0, scale: 0.97, duration: 0.5, ease: 'power2.in' }
-        ),
-        // ── Re-enter from top (scrolling back down) ──
-        onEnterBack: () => gsap.fromTo(card,
-          { y: -40, opacity: 0, scale: 0.97 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' }
-        ),
-        // ── Exit bottom (scrolling back up past it) ──
-        onLeaveBack: () => gsap.to(card,
-          { y: 60, opacity: 0, scale: 0.97, duration: 0.5, ease: 'power2.in' }
-        ),
-      });
-      triggers.push(enterTrigger);
-    });
-
-    return () => { triggers.forEach(t => t.kill()); };
-  }, [loading, projects]);
-
-
   return (
     <main className="pt-14">
       {/* ── Hero Section ─────────────────────────────────────────────── */}
       <section ref={heroRef} className="min-h-[90vh] flex flex-col justify-end border-b-2 border-[#0a0a0a]">
-        <div className="max-w-[1400px] mx-auto w-full">
+        <div className="site-shell w-full">
           {/* Top meta bar */}
           <div ref={metaRef} className="flex items-center border-b-2 border-[#0a0a0a] px-6 py-3">
             <span className="font-mono text-xs text-[#666] uppercase tracking-widest">
@@ -83,7 +59,7 @@ export default function Home() {
               Yerevan, Armenia
             </span>
             <span className="ml-auto font-mono text-xs text-[#666] uppercase tracking-widest">
-              Available for work ◉
+              {CAPACITY} ◉
             </span>
           </div>
 
@@ -93,9 +69,9 @@ export default function Home() {
               ref={headingRef}
               className="text-[clamp(3rem,10vw,9rem)] font-bold leading-[0.9] tracking-[-0.03em] uppercase"
             >
-              Artagers
+              From Problem
               <br />
-              <span className="inline-block border-b-[6px] border-[#0a0a0a]">Grigoryan</span>
+              To <span className="inline-block border-b-[6px] border-[#0a0a0a]">Production</span>
             </h1>
           </div>
 
@@ -103,12 +79,35 @@ export default function Home() {
           <div ref={subRef} className="flex flex-col md:flex-row">
             <div className="flex-1 px-6 py-8 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
               <p className="text-base md:text-lg text-[#444] leading-relaxed max-w-lg font-light">
-                Artagers Grigoryan. Specializing in UX/UI for online casinos,
-                custom games, complex dashboards, and Telegram ecosystem games.
+                I'm Artagers Grigoryan — product designer for iGaming, Web3 and
+                data-heavy platforms. I design the product, and when you need it
+                live rather than just drawn, I build and ship the front-end myself.
               </p>
+              <div className="flex flex-wrap items-center gap-4 mt-8">
+                <Link
+                  to="/contact"
+                  className="btn-brutal-primary"
+                  onClick={() => trackEvent('cta_start_project', { location: 'hero' })}
+                >
+                  Start a project →
+                </Link>
+                <a
+                  href="#work"
+                  className="btn-brutal font-mono text-sm"
+                  onClick={(e) => {
+                    const target = document.getElementById('work');
+                    if (lenis && target) {
+                      e.preventDefault();
+                      lenis.scrollTo(target);
+                    }
+                  }}
+                >
+                  See the work
+                </a>
+              </div>
             </div>
             <div className="flex-1 px-6 py-8 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
-              <p className="label-mono mb-2">Core Stack</p>
+              <p className="label-mono mb-2">Design</p>
               <p className="font-mono text-sm">
                 Figma · Webflow · Tilda
                 <br />
@@ -116,14 +115,37 @@ export default function Home() {
               </p>
             </div>
             <div className="flex-1 px-6 py-8">
-              <p className="label-mono mb-2">Domains</p>
+              <p className="label-mono mb-2">Build</p>
               <p className="font-mono text-sm">
-                Casino UX · Game Design
+                Next.js · React · TypeScript
                 <br />
-                Dashboards · Web3 · Telegram
+                Node · PostgreSQL · Prisma · Vercel
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── Proof strip ──────────────────────────────────────────────────
+          Four figures, each traceable to something a visitor can open. */}
+      <section className="border-b-2 border-[#0a0a0a]">
+        <div className="site-shell flex flex-col md:flex-row">
+          {[
+            { figure: '4+ years', detail: 'Product design' },
+            { figure: '8 games', detail: 'One UI system, zero dev revisions' },
+            { figure: '3 platforms', detail: 'Web, iOS, Android' },
+            { figure: 'Full-stack', detail: 'Next.js · Node · Postgres · Prisma' },
+          ].map((item, i) => (
+            <div
+              key={item.figure}
+              className={`flex-1 px-6 py-8 border-[#0a0a0a] ${i < 3 ? 'border-b-2 md:border-b-0 md:border-r-2' : ''}`}
+            >
+              <p className="text-2xl lg:text-3xl font-bold uppercase leading-none tracking-tight">
+                {item.figure}
+              </p>
+              <p className="label-mono mt-2">{item.detail}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -131,7 +153,7 @@ export default function Home() {
       <MarqueeBar />
 
       {/* ── Case Studies ─────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto">
+      <section id="work" className="site-shell">
         {/* Section header */}
         <div className="flex items-center justify-between px-6 py-6 border-b-2 border-[#0a0a0a]">
           <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
@@ -142,51 +164,35 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Cards */}
-        <div ref={projectsRef}>
-          {loading ? (
-            // Skeleton
-            [0, 1, 2].map((i) => (
-              <div key={i} className="project-card-wrapper border-b-2 border-[#0a0a0a]">
-                <div className="flex flex-col lg:flex-row h-[300px] animate-pulse">
-                  <div className="lg:w-[55%] bg-[#f0f0f0]" />
-                  <div className="lg:w-[45%] p-8 space-y-4">
-                    <div className="h-3 bg-[#f0f0f0] w-24" />
-                    <div className="h-8 bg-[#f0f0f0] w-3/4" />
-                    <div className="h-4 bg-[#f0f0f0] w-full" />
-                    <div className="h-4 bg-[#f0f0f0] w-2/3" />
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            projects.map((project, i) => (
-              <div key={project.id} className="project-card-wrapper border-b-2 border-[#0a0a0a]">
-                <ProjectCard project={project} index={i} />
-              </div>
-            ))
-          )}
-        </div>
+        <SelectedWork projects={projects} loading={loading} />
       </section>
+
+      <OfferTiers />
+      <ProcessSteps />
+      <ToolPromo />
 
       {/* ── CTA Strip ────────────────────────────────────────────────── */}
       <section className="border-t-2 border-[#0a0a0a] bg-[#0a0a0a] text-white">
-        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-12 gap-6">
+        <div className="site-shell flex flex-col md:flex-row items-center justify-between px-6 py-12 gap-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-[#666] mb-2">
-              Let's collaborate
+              Let's talk
             </p>
-            <h3 className="text-3xl md:text-5xl font-bold leading-none">
-              Have a project?
+            <h3 className="text-3xl md:text-5xl font-bold leading-none uppercase">
+              Got a product that needs
               <br />
-              Let's talk.
+              designing — or shipping?
             </h3>
+            <p className="text-sm text-[#999] font-light mt-4 max-w-md">
+              Tell me about it. A real answer within 24 hours, no discovery-call funnel.
+            </p>
           </div>
           <Link
             to="/contact"
-            className="btn-brutal-filled border-white text-white hover:bg-white hover:text-[#0a0a0a] font-mono text-sm py-4 px-8 whitespace-nowrap"
+            className="btn-brutal-primary-invert whitespace-nowrap"
+            onClick={() => trackEvent('cta_start_project', { location: 'footer_strip' })}
           >
-            Get In Touch →
+            Start a project →
           </Link>
         </div>
       </section>

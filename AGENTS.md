@@ -8,9 +8,8 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 npm run dev       # Start dev server (Vite)
 npm run build     # TypeScript check + production build
 npm run preview   # Preview production build locally
+npm test          # Run the vitest suite (12 tests)
 ```
-
-No test runner is configured.
 
 ## Architecture
 
@@ -32,7 +31,13 @@ Elements that animate in must start hidden; use the `.gsap-hidden` CSS class or 
 
 ### Routing & Layout
 
-`src/App.tsx` wraps everything in `<BrowserRouter>` → `<SmoothScroll>` → `<Layout>`. The footer is hidden on `/admin`. `ScrollReset` (inside Layout) calls `lenis.scrollTo(0)` on every route change.
+`src/App.tsx` wraps everything in `<BrowserRouter>` → `<SmoothScroll>` → `<Layout>`. Routes include `/`, `/about`, `/hire`, `/contact`, `/work/:slug` and `/admin`. `/hire` is the secondary recruiter-facing path (CV, experience, education) — the navbar links to it as "CV", separate from the client-facing "Hire Me →" CTA which targets `/contact`. The footer is hidden on `/admin`. `ScrollReset` (inside Layout) calls `lenis.scrollTo(0)` on every route change.
+
+Each page calls `usePageMeta` (`src/hooks/usePageMeta.ts`) with a `title`, `description` and `path` to set per-route `<title>`, meta description, canonical URL, and Open Graph / Twitter card tags.
+
+### Analytics
+
+`src/lib/analytics.ts` exports `trackEvent`, a thin wrapper around `@vercel/analytics`'s `track()` with a closed `AnalyticsEvent` union (so a typo in an event name is a type error) and swallowed failures (an ad blocker must never break a user flow). Key events: `cta_start_project` (fired from every CTA that routes to `/contact` — homepage, navbar, mobile menu, About), `brief_started`, `brief_submitted`, `telegram_click`, `hire_page_view`.
 
 ### Admin Panel
 
@@ -40,12 +45,12 @@ Elements that animate in must start hidden; use the `.gsap-hidden` CSS class or 
 
 ### Contact Form & Serverless Function
 
-The contact form in `src/pages/Contact.tsx` POSTs to `/api/contact` — a Vercel serverless function at `api/contact.ts`. The function reads `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` from `process.env` (server-side only, no `VITE_` prefix) and forwards submissions to a Telegram chat via the Bot API using MarkdownV2 formatting. Input is validated (length limits: 100/200/3900 chars) and escaped before sending.
+The contact form in `src/pages/Contact.tsx` is a qualified project brief (name, email, project type, need, timeline, budget, links, message) that POSTs to `/api/contact` — a Vercel serverless function at `api/contact.ts`. Validation and Telegram-message formatting live in `api/_brief.ts` (the `_` prefix keeps Vercel from treating it as its own endpoint), so they can be unit-tested without a request object — see `api/_brief.test.ts`. Field length caps are 100/200/500/3900 chars (name/email/links/message); the formatted MarkdownV2 message is also checked against Telegram's combined 4096-character payload limit, since per-field caps can sum past it once escaping adds backslashes. The function reads `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` from `process.env` (server-side only, no `VITE_` prefix) and forwards the formatted brief to a Telegram chat via the Bot API.
 
 ### Styling Conventions
 
 - Tailwind CSS v4 (configured via `@tailwindcss/vite` plugin, no `tailwind.config.js`)
-- Custom utility classes are defined in `src/index.css`: `.border-brutal`, `.border-brutal-thick`, `.btn-brutal`, `.btn-brutal-filled`, `.label-mono`, `.grid-line-v`, `.grid-line-h`
+- Custom utility classes are defined in `src/index.css`: `.border-brutal`, `.border-brutal-thick`, `.btn-brutal`, `.btn-brutal-filled`, `.btn-brutal-primary`, `.btn-brutal-primary-invert`, `.label-mono`, `.heading-section`, `.site-shell`, `.grid-line-v`, `.grid-line-h`. The visual system is frozen — reuse these rather than adding new ones.
 - Fonts: **Space Grotesk** (sans, body) and **Space Mono** (mono, labels/buttons) — loaded via Google Fonts in `index.html`
 - Color palette: near-black `#0a0a0a` on white `#ffffff`; accent yellow `#f5c842` used in the Admin warning banner
 
@@ -73,5 +78,5 @@ Copy `.env.example` → `.env`. The SQL schema to bootstrap the database is embe
 
 - `favicon.svg` — "AG" SVG favicon
 - `robots.txt` — disallows `/admin`, references sitemap
-- `sitemap.xml` — lists `/`, `/about`, `/contact`
-- `llms.txt` — plain-text profile summary for AI crawlers (no JS required to read)
+- `sitemap.xml` — lists `/`, `/work/telegram-mini-app-games`, `/contact`, `/hire`, `/about`
+- `llms.txt` — plain-text profile summary for AI crawlers (no JS required to read); must stay consistent with the data actually rendered by `src/hooks/useSupabaseData.ts`'s fallback arrays

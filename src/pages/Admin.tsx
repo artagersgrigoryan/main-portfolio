@@ -46,6 +46,8 @@ function CaseStudiesAdmin() {
       image_url: editing.image_url || '',
       link: editing.link || '#',
       tags: editing.tags || [],
+      outcome: editing.outcome || null,
+      link_label: editing.link_label || null,
       display_order: editing.display_order ?? data.length + 1,
     };
     if (editing.id) {
@@ -136,7 +138,7 @@ function CaseStudiesAdmin() {
           )}
           <button
             className="btn-brutal-filled text-xs py-2 px-4"
-            onClick={() => setEditing({ title: '', description: '', image_url: '', link: '#', tags: [], display_order: data.length + 1 })}
+            onClick={() => setEditing({ title: '', description: '', image_url: '', link: '#', tags: [], outcome: '', link_label: '', display_order: data.length + 1 })}
           >
             + Add New
           </button>
@@ -162,6 +164,8 @@ function CaseStudiesAdmin() {
                 onError={msg => showBanner(msg, 'error')}
               />
               <AdminField label="Project Link" value={editing.link || ''} onChange={v => setEditing({ ...editing, link: v })} placeholder="https://… (external) or /work/slug (internal case page)" />
+              <AdminField label="Outcome" value={editing.outcome || ''} onChange={v => setEditing({ ...editing, outcome: v })} placeholder="One defensible result — numbers beat adjectives" multiline />
+              <AdminField label="Link Label" value={editing.link_label || ''} onChange={v => setEditing({ ...editing, link_label: v })} placeholder="Open on the App Store ↗" />
               <AdminField
                 label="Tags (comma-separated)"
                 value={(editing.tags || []).join(', ')}
@@ -679,7 +683,7 @@ export default function Admin() {
     <main className="pt-14 min-h-screen">
       {/* Header */}
       <div className="border-b-2 border-[#0a0a0a] bg-[#0a0a0a] text-white">
-        <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="site-shell px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="font-mono text-sm font-bold uppercase tracking-widest">Admin Panel</h1>
             <p className="font-mono text-[10px] text-[#666] mt-0.5">Portfolio Content Management</p>
@@ -702,7 +706,7 @@ export default function Admin() {
 
       {/* Supabase setup notice */}
       {!isConfigured() && (
-        <div className="bg-yellow-50 border-b-2 border-yellow-400 max-w-[1400px] mx-auto w-full px-6 py-4">
+        <div className="bg-yellow-50 border-b-2 border-yellow-400 site-shell w-full px-6 py-4">
           <p className="font-mono text-xs text-yellow-800 uppercase tracking-widest font-bold mb-1">
             ⚠ Supabase Not Connected
           </p>
@@ -713,13 +717,13 @@ export default function Admin() {
       )}
 
       {/* SQL Schema download hint */}
-      <div className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a] px-6 py-3 bg-[#f8f8f8]">
+      <div className="site-shell border-b-2 border-[#0a0a0a] px-6 py-3 bg-[#f8f8f8]">
         <p className="font-mono text-[10px] text-[#666] uppercase tracking-widest">
           SQL Schema is embedded in <code>src/lib/supabase.ts</code> as a comment block — copy & paste into your Supabase SQL Editor.
         </p>
       </div>
 
-      <div className="max-w-[1400px] mx-auto">
+      <div className="site-shell">
         {/* Tabs */}
         <div className="flex border-b-2 border-[#0a0a0a]">
           {TABS.map(t => (

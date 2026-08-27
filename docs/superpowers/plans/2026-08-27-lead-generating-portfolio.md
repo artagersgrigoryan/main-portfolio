@@ -753,10 +753,11 @@ export default function ToolPromo() {
             who can't brief a project
           </h2>
           <p className="text-base text-[#444] leading-relaxed font-light mt-4 max-w-xl">
-            Answer 13 questions, get a complete website brief you can paste into
-            Cursor, v0, Bolt, Lovable or Arena. I founded it, designed it, built
-            it and shipped it — which is also the shortest answer to “can you
-            actually build things?”
+            Most projects go wrong before design starts — in a brief that never
+            said what the thing was for. PromptStation asks the 13 questions I
+            would ask in a kickoff call, then hands you the answers as a
+            document. Take it to your own developer, paste it into an AI
+            builder, or bring it to me.
           </p>
         </div>
         <a
@@ -906,6 +907,29 @@ describe('validateBrief', () => {
   it('rejects a non-object body', () => {
     expect(validateBrief(null)).toEqual({ ok: false, error: 'Missing required fields' });
   });
+
+  it('rejects a brief whose formatted message would exceed the Telegram limit', () => {
+    // Each field sits exactly at (or under) its own individual cap — name<=100,
+    // email<=200, links<=500, message<=3900 — so the earlier per-field length
+    // check passes and this exercises the new combined-length check instead.
+    const result = validateBrief({
+      ...valid,
+      name: 'x'.repeat(100),
+      email: `${'x'.repeat(188)}@example.com`,
+      links: 'x'.repeat(500),
+      message: 'x'.repeat(3900),
+    });
+    expect(result).toEqual({ ok: false, error: 'Brief too long — please shorten it' });
+  });
+
+  it('accepts a realistically long brief', () => {
+    const result = validateBrief({
+      ...valid,
+      links: 'https://example.com '.repeat(5),
+      message: 'x'.repeat(2500),
+    });
+    expect(result.ok).toBe(true);
+  });
 });
 
 describe('formatBriefMessage', () => {
@@ -923,6 +947,16 @@ describe('formatBriefMessage', () => {
     const text = formatBriefMessage(result.value);
     expect(text).not.toContain('Timeline');
     expect(text).not.toContain('Budget');
+  });
+
+  it('escapes every MarkdownV2 reserved character', () => {
+    const reserved = '_*[]()~`>#+-=|{}.!\\';
+    const result = validateBrief({ ...valid, message: reserved });
+    if (!result.ok) throw new Error('fixture should validate');
+    const text = formatBriefMessage(result.value);
+    for (const ch of reserved) {
+      expect(text).toContain(`\\${ch}`);
+    }
   });
 });
 ```
@@ -960,6 +994,9 @@ export const NEEDS = ['Design only', 'Design → Built', 'Not sure yet'] as cons
 export const TIMELINES = ['ASAP', '1–3 months', '3+ months', 'Just exploring'] as const;
 
 export const BUDGETS = ['Under $2k', '$2–5k', '$5–15k', '$15k+', 'Not sure yet'] as const;
+
+/** Telegram rejects any sendMessage payload over this length outright. */
+export const TELEGRAM_MAX_CHARS = 4096;
 
 export interface Brief {
   name: string;
@@ -1022,6 +1059,14 @@ export function validateBrief(body: unknown): ValidationResult {
     !inList(brief.budget, BUDGETS)
   ) {
     return { ok: false, error: 'Invalid selection' };
+  }
+
+  // The per-field caps can sum past Telegram's limit once MarkdownV2 escaping
+  // adds backslashes, so check the message we will actually send rather than
+  // its parts. Without this, a brief validates, Telegram rejects it, and the
+  // visitor sees only a generic error — a silently lost lead.
+  if (formatBriefMessage(brief).length > TELEGRAM_MAX_CHARS) {
+    return { ok: false, error: 'Brief too long — please shorten it' };
   }
 
   return { ok: true, value: brief };

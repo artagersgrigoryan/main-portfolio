@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
+import { trackEvent } from '../lib/analytics';
 
 const NAV_LINKS = [
   { label: 'Work', href: '/' },
   { label: 'About', href: '/about' },
+  { label: 'CV', href: '/hire' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -57,7 +59,7 @@ export default function Navbar() {
 
   return (
     <header ref={navRef} className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-[#0a0a0a]">
-      <div className="max-w-[1400px] mx-auto flex items-stretch h-14 relative z-[100] bg-white">
+      <div className="site-shell flex items-stretch h-14 relative z-[100] bg-white">
         {/* Logo */}
         <Link
           to="/"
@@ -86,6 +88,7 @@ export default function Navbar() {
           })}
           <Link
             to="/contact"
+            onClick={() => trackEvent('cta_start_project', { location: 'navbar' })}
             className="flex items-center px-6 border-l-2 border-[#0a0a0a] bg-[#0a0a0a] text-white font-mono text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-[#0a0a0a] transition-colors"
           >
             Hire Me →
@@ -132,7 +135,10 @@ export default function Navbar() {
             <Link
               to="/contact"
               ref={(el) => { linksRef.current[NAV_LINKS.length] = el; }}
-              onClick={handleClose}
+              onClick={() => {
+                trackEvent('cta_start_project', { location: 'mobile_menu' });
+                handleClose();
+              }}
               className="mt-8 px-10 py-4 border-2 border-[#0a0a0a] font-mono text-sm font-bold uppercase tracking-widest hover:bg-[#0a0a0a] hover:text-white transition-all active:scale-95"
             >
               Get in Touch →

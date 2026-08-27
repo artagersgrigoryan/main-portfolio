@@ -44,6 +44,16 @@ body {
   background: #333;
 }
 
+/* ── Site shell: page grid container ─────────────────────────────────────
+   Below 1400px it fills the viewport. Above it, the grid keeps growing with
+   the screen (95vw) up to a 2000px cap, so wide monitors don't get dead
+   whitespace down both edges. */
+.site-shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: max(1400px, min(95vw, 2000px));
+}
+
 /* Brutalist border utilities */
 .border-brutal {
   border: 2px solid #0a0a0a;
@@ -108,6 +118,44 @@ body {
   color: #666;
 }
 
+/* ── Selected Work list ──────────────────────────────────────────────────
+   Hovering the list dims every row but the one under the cursor. Gated to
+   fine pointers so touch devices (which reveal on scroll) never dim. */
+@media (hover: hover) and (pointer: fine) {
+  /* Touch devices tween this with GSAP instead — a CSS transition there would
+     double-ease every frame. */
+  .work-row {
+    transition: opacity 0.5s ease;
+  }
+
+  .work-list:hover .work-row {
+    opacity: 0.35;
+  }
+
+  .work-list .work-row:hover {
+    opacity: 1;
+  }
+
+  /* The floating cover stands in for the pointer while over the list. */
+  .work-list,
+  .work-list * {
+    cursor: none;
+  }
+}
+
+/* Keyboard focus has no cursor for the floating preview to follow —
+   invert the row instead. */
+.work-row:focus-visible {
+  outline: none;
+  background: #0a0a0a;
+  opacity: 1;
+}
+
+.work-row:focus-visible,
+.work-row:focus-visible * {
+  color: #ffffff;
+}
+
 /* Marquee animation */
 @keyframes marquee {
   0% {
@@ -155,4 +203,61 @@ select:focus {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ── Section heading ──────────────────────────────────────────────────────
+   The scale jumps from the clamp(3rem,10vw,9rem) hero straight to 11px mono
+   labels with nothing between. The new page has six section headers, so it
+   needs a middle step. */
+.heading-section {
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* ── Primary CTA ──────────────────────────────────────────────────────────
+   The one element allowed to outweigh its neighbours. `.btn-brutal` and
+   `.btn-brutal-filled` share identical 10px/20px padding with every other
+   bordered box, which left the most important control on the page indis-
+   tinguishable from a label. */
+.btn-brutal-primary {
+  border: 2px solid #0a0a0a;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 18px 36px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.btn-brutal-primary:hover {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+/* Inverted context (the black CTA strip): white fill so the button still
+   dominates rather than receding into an outline. */
+.btn-brutal-primary-invert {
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #0a0a0a;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 18px 36px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.btn-brutal-primary-invert:hover {
+  background: transparent;
+  color: #ffffff;
 }
