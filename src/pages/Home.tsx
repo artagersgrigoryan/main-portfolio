@@ -3,6 +3,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SelectedWork from '../components/SelectedWork';
 import MarqueeBar from '../components/MarqueeBar';
+import OfferTiers from '../components/OfferTiers';
+import ProcessSteps from '../components/ProcessSteps';
+import ToolPromo from '../components/ToolPromo';
 import { Link } from 'react-router-dom';
 import { useCaseStudies } from '../hooks/useSupabaseData';
 import { trackEvent } from '../lib/analytics';
@@ -158,6 +161,10 @@ export default function Home() {
 
         <SelectedWork projects={projects} loading={loading} />
       </section>
+
+      <OfferTiers />
+      <ProcessSteps />
+      <ToolPromo />
 
       {/* ── CTA Strip ────────────────────────────────────────────────── */}
       <section className="border-t-2 border-[#0a0a0a] bg-[#0a0a0a] text-white">
