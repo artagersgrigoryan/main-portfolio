@@ -753,10 +753,11 @@ export default function ToolPromo() {
             who can't brief a project
           </h2>
           <p className="text-base text-[#444] leading-relaxed font-light mt-4 max-w-xl">
-            Answer 13 questions, get a complete website brief you can paste into
-            Cursor, v0, Bolt, Lovable or Arena. I founded it, designed it, built
-            it and shipped it — which is also the shortest answer to “can you
-            actually build things?”
+            Most projects go wrong before design starts — in a brief that never
+            said what the thing was for. PromptStation asks the 13 questions I
+            would ask in a kickoff call, then hands you the answers as a
+            document. Take it to your own developer, paste it into an AI
+            builder, or bring it to me.
           </p>
         </div>
         <a
