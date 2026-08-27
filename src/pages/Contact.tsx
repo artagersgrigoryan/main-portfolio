@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useContactLinks } from '../hooks/useSupabaseData';
+import { PROJECT_TYPES, NEEDS, TIMELINES, BUDGETS } from '../../api/_brief';
+import { trackEvent } from '../lib/analytics';
 
 export default function Contact() {
   const { data: links } = useContactLinks();
@@ -10,8 +12,18 @@ export default function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
 
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({
+    name: '', email: '', projectType: '', need: '',
+    timeline: '', budget: '', links: '', message: '',
+  });
+  const [started, setStarted] = useState(false);
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  const markStarted = () => {
+    if (started) return;
+    setStarted(true);
+    trackEvent('brief_started');
+  };
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
@@ -28,21 +40,25 @@ export default function Contact() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          message: formData.message.trim(),
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) throw new Error('Server error');
 
+      trackEvent('brief_submitted', {
+        projectType: formData.projectType,
+        need: formData.need,
+        budget: formData.budget || 'unspecified',
+      });
       setStatus('sent');
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({
+        name: '', email: '', projectType: '', need: '',
+        timeline: '', budget: '', links: '', message: '',
+      });
     } catch {
       setStatus('error');
+      setTimeout(() => setStatus('idle'), 4000);
     }
-    setTimeout(() => setStatus('idle'), 4000);
   };
 
   const getIcon = (type: string) => {
@@ -72,8 +88,8 @@ export default function Contact() {
           </div>
           <div className="flex-1 flex flex-col justify-end px-6 py-10">
             <p className="text-base text-[#444] leading-relaxed font-light max-w-md">
-              Open to new projects, collaborations, and full-time positions.
-              Reach out via the form or any of the channels below.
+              Tell me what you're building. The more you put in the brief, the
+              more useful my first reply is.
             </p>
             <p className="font-mono text-xs text-[#666] uppercase tracking-widest mt-4">
               Response time: within 24 hours
@@ -89,6 +105,23 @@ export default function Contact() {
           <div className="px-6 py-5 border-b-2 border-[#0a0a0a]">
             <p className="label-mono">Direct Channels</p>
           </div>
+
+          <a
+            href="https://t.me/artagers"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackEvent('telegram_click', { location: 'contact' })}
+            className="flex items-center gap-4 px-6 py-6 border-b-2 border-[#0a0a0a] bg-[#0a0a0a] text-white hover:bg-white hover:text-[#0a0a0a] transition-colors group"
+          >
+            <div className="w-10 h-10 border-2 border-current flex items-center justify-center font-mono text-sm font-bold shrink-0">
+              ✈
+            </div>
+            <div>
+              <p className="label-mono text-[#999] group-hover:text-[#666]">Prefer to just talk?</p>
+              <p className="font-mono text-sm font-bold mt-0.5">Message me on Telegram</p>
+            </div>
+            <span className="ml-auto font-mono text-lg">→</span>
+          </a>
 
           {links.map((link, i) => (
             <a
@@ -139,6 +172,7 @@ export default function Contact() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onFocus={markStarted}
                 placeholder="John Doe"
                 className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb]"
               />
@@ -154,7 +188,29 @@ export default function Contact() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onFocus={markStarted}
                 placeholder="john@company.com"
+                className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb]"
+              />
+            </div>
+
+            <BriefSelect label="Project type" value={formData.projectType} options={PROJECT_TYPES} required
+              onChange={(v) => setFormData({ ...formData, projectType: v })} onFocus={markStarted} />
+            <BriefSelect label="What you need" value={formData.need} options={NEEDS} required
+              onChange={(v) => setFormData({ ...formData, need: v })} onFocus={markStarted} />
+            <BriefSelect label="Timeline" value={formData.timeline} options={TIMELINES}
+              onChange={(v) => setFormData({ ...formData, timeline: v })} onFocus={markStarted} />
+            <BriefSelect label="Budget range" value={formData.budget} options={BUDGETS}
+              onChange={(v) => setFormData({ ...formData, budget: v })} onFocus={markStarted} />
+
+            <div className="border-2 border-[#0a0a0a] mb-[-2px]">
+              <label className="block px-4 pt-4 label-mono">Links</label>
+              <input
+                type="text"
+                value={formData.links}
+                onChange={(e) => setFormData({ ...formData, links: e.target.value })}
+                onFocus={markStarted}
+                placeholder="Your site, deck, or Figma"
                 className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb]"
               />
             </div>
@@ -169,6 +225,7 @@ export default function Contact() {
                 rows={8}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                onFocus={markStarted}
                 placeholder="Tell me about your project, timeline, and goals..."
                 className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb] resize-none"
               />
@@ -179,14 +236,14 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="btn-brutal-filled py-4 px-10 font-mono text-sm disabled:opacity-50"
+                className="btn-brutal-primary disabled:opacity-50"
               >
                 {status === 'sending' ? 'Sending...' : status === 'sent' ? 'Sent ✓' : 'Send Message →'}
               </button>
 
               {status === 'sent' && (
-                <p className="font-mono text-xs text-green-700 uppercase tracking-widest">
-                  Message received! I'll get back to you soon.
+                <p className="font-mono text-xs text-green-700 uppercase tracking-widest max-w-sm leading-relaxed">
+                  Brief received. I read every one personally and reply within 24 hours — usually sooner.
                 </p>
               )}
               {status === 'error' && (
@@ -199,5 +256,34 @@ export default function Contact() {
         </div>
       </div>
     </main>
+  );
+}
+
+function BriefSelect({
+  label, value, options, required, onChange, onFocus,
+}: {
+  label: string;
+  value: string;
+  options: readonly string[];
+  required?: boolean;
+  onChange: (v: string) => void;
+  onFocus: () => void;
+}) {
+  return (
+    <div className="border-2 border-[#0a0a0a] mb-[-2px]">
+      <label className="block px-4 pt-4 label-mono">
+        {label}{required ? ' *' : ''}
+      </label>
+      <select
+        required={required}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={onFocus}
+        className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
+      >
+        <option value="">Select…</option>
+        {options.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
   );
 }
