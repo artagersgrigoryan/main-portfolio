@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -119,9 +120,11 @@ export default function CaseStudyFury() {
   const heroRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    document.title = 'FURY Casino — 8 Mini-Games on One UI System | Artagers Grigoryan';
-  }, []);
+  usePageMeta({
+    title: 'FURY Telegram Mini-App Games — Case Study',
+    description: 'Eight casino mini-games on one scalable UI system. 16 responsive interfaces designed solo in two weeks, with zero design revisions during development.',
+    path: '/work/telegram-mini-app-games',
+  });
 
   // ── Hero entrance ──────────────────────────────────────────────────────
   useEffect(() => {

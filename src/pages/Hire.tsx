@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useWorkExperience } from '../hooks/useSupabaseData';
 import { trackEvent } from '../lib/analytics';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const EDUCATION = [
   { school: 'Pixel IT School', field: 'UX/UI Design', type: 'Professional' },
@@ -32,8 +33,13 @@ const ARGUMENTS = [
 export default function Hire() {
   const { data: experience } = useWorkExperience();
 
+  usePageMeta({
+    title: 'Hire me — Artagers Grigoryan, Product Designer',
+    description: 'Product designer with four years in iGaming, Web3 and data-heavy platforms who also builds production front-ends. Open to full-time and contract roles.',
+    path: '/hire',
+  });
+
   useEffect(() => {
-    document.title = 'Hire me — Artagers Grigoryan';
     trackEvent('hire_page_view');
   }, []);
 

@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useCaseStudies } from '../hooks/useSupabaseData';
 import { trackEvent } from '../lib/analytics';
 import { useLenis } from '../components/SmoothScroll';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 /**
  * Hand-edited. "Available for work" read as *unemployed* to a prospective
@@ -25,7 +26,11 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
 
-  useEffect(() => { document.title = 'Artagers Grigoryan — Product Designer'; }, []);
+  usePageMeta({
+    title: 'Artagers Grigoryan — Product Designer for iGaming, Web3 & Dashboards',
+    description: 'Product designer who ships. iGaming, Web3 and data-heavy platforms — designed, and built when you need it live. Yerevan, Armenia.',
+    path: '/',
+  });
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);

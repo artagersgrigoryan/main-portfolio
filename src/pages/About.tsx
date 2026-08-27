@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const HOBBIES = [
   { emoji: '🧩', label: "Rubik's Cube", note: '30-second solve' },
@@ -9,7 +10,11 @@ const HOBBIES = [
 ];
 
 export default function About() {
-  useEffect(() => { document.title = 'About — Artagers Grigoryan'; }, []);
+  usePageMeta({
+    title: 'About — Artagers Grigoryan',
+    description: 'How a fine-art background turned into designing and shipping products for iGaming, Web3 and mobility.',
+    path: '/about',
+  });
   const stickyImgRef = useRef<HTMLDivElement>(null);
   const bioRef = useRef<HTMLDivElement>(null);
 
