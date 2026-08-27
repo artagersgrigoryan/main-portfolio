@@ -46,6 +46,8 @@ function CaseStudiesAdmin() {
       image_url: editing.image_url || '',
       link: editing.link || '#',
       tags: editing.tags || [],
+      outcome: editing.outcome || null,
+      link_label: editing.link_label || null,
       display_order: editing.display_order ?? data.length + 1,
     };
     if (editing.id) {
@@ -136,7 +138,7 @@ function CaseStudiesAdmin() {
           )}
           <button
             className="btn-brutal-filled text-xs py-2 px-4"
-            onClick={() => setEditing({ title: '', description: '', image_url: '', link: '#', tags: [], display_order: data.length + 1 })}
+            onClick={() => setEditing({ title: '', description: '', image_url: '', link: '#', tags: [], outcome: '', link_label: '', display_order: data.length + 1 })}
           >
             + Add New
           </button>
@@ -162,6 +164,8 @@ function CaseStudiesAdmin() {
                 onError={msg => showBanner(msg, 'error')}
               />
               <AdminField label="Project Link" value={editing.link || ''} onChange={v => setEditing({ ...editing, link: v })} placeholder="https://… (external) or /work/slug (internal case page)" />
+              <AdminField label="Outcome" value={editing.outcome || ''} onChange={v => setEditing({ ...editing, outcome: v })} placeholder="One defensible result — numbers beat adjectives" multiline />
+              <AdminField label="Link Label" value={editing.link_label || ''} onChange={v => setEditing({ ...editing, link_label: v })} placeholder="Open on the App Store ↗" />
               <AdminField
                 label="Tags (comma-separated)"
                 value={(editing.tags || []).join(', ')}

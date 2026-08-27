@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { CaseStudy } from '../lib/supabase';
+import { trackEvent } from '../lib/analytics';
 
 interface ProjectRowProps {
   project: CaseStudy;
@@ -23,6 +24,10 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
 
   const rowClass = 'work-row group block px-6 py-8 lg:py-10 xl:py-12';
 
+  const handleVerifyClick = () => {
+    trackEvent('verify_link_click', { project: project.title });
+  };
+
   const content = (
     <>
       <div className="project-row-text flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
@@ -39,6 +44,12 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
           {project.description}
         </p>
 
+        {project.outcome && (
+          <p className="lg:max-w-sm text-sm text-[#444] leading-snug font-light lg:order-last lg:w-full">
+            {project.outcome}
+          </p>
+        )}
+
         <div className="flex items-center gap-4 lg:ml-auto lg:gap-8">
           <div className="flex flex-wrap gap-2">
             {project.tags.map((tag) => (
@@ -51,10 +62,9 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
             ))}
           </div>
           <span
-            aria-hidden
-            className="font-mono text-base shrink-0 ml-auto lg:ml-0 transition-transform duration-500 ease-out lg:group-hover:translate-x-2"
+            className="font-mono text-[11px] uppercase tracking-widest shrink-0 ml-auto lg:ml-0 whitespace-nowrap transition-transform duration-500 ease-out lg:group-hover:translate-x-2"
           >
-            →
+            {project.link_label || 'View project →'}
           </span>
         </div>
       </div>
@@ -64,7 +74,7 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
   const hoverProps = hoverEnabled ? { onMouseEnter: () => onActivate(index) } : {};
 
   return isInternal ? (
-    <Link to={project.link} className={rowClass} {...hoverProps}>
+    <Link to={project.link} className={rowClass} onClick={handleVerifyClick} {...hoverProps}>
       {content}
     </Link>
   ) : (
@@ -73,7 +83,7 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
       target={isInert ? undefined : '_blank'}
       rel="noopener noreferrer"
       className={rowClass}
-      onClick={(e) => { if (isInert) e.preventDefault(); }}
+      onClick={(e) => { if (isInert) { e.preventDefault(); return; } handleVerifyClick(); }}
       {...hoverProps}
     >
       {content}
