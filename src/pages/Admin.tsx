@@ -679,7 +679,7 @@ export default function Admin() {
     <main className="pt-14 min-h-screen">
       {/* Header */}
       <div className="border-b-2 border-[#0a0a0a] bg-[#0a0a0a] text-white">
-        <div className="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="site-shell px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="font-mono text-sm font-bold uppercase tracking-widest">Admin Panel</h1>
             <p className="font-mono text-[10px] text-[#666] mt-0.5">Portfolio Content Management</p>
@@ -702,7 +702,7 @@ export default function Admin() {
 
       {/* Supabase setup notice */}
       {!isConfigured() && (
-        <div className="bg-yellow-50 border-b-2 border-yellow-400 max-w-[1400px] mx-auto w-full px-6 py-4">
+        <div className="bg-yellow-50 border-b-2 border-yellow-400 site-shell w-full px-6 py-4">
           <p className="font-mono text-xs text-yellow-800 uppercase tracking-widest font-bold mb-1">
             ⚠ Supabase Not Connected
           </p>
@@ -713,13 +713,13 @@ export default function Admin() {
       )}
 
       {/* SQL Schema download hint */}
-      <div className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a] px-6 py-3 bg-[#f8f8f8]">
+      <div className="site-shell border-b-2 border-[#0a0a0a] px-6 py-3 bg-[#f8f8f8]">
         <p className="font-mono text-[10px] text-[#666] uppercase tracking-widest">
           SQL Schema is embedded in <code>src/lib/supabase.ts</code> as a comment block — copy & paste into your Supabase SQL Editor.
         </p>
       </div>
 
-      <div className="max-w-[1400px] mx-auto">
+      <div className="site-shell">
         {/* Tabs */}
         <div className="flex border-b-2 border-[#0a0a0a]">
           {TABS.map(t => (

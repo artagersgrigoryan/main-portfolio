@@ -57,7 +57,7 @@ export default function Navbar() {
 
   return (
     <header ref={navRef} className="fixed top-0 left-0 right-0 z-50 bg-white border-b-2 border-[#0a0a0a]">
-      <div className="max-w-[1400px] mx-auto flex items-stretch h-14 relative z-[100] bg-white">
+      <div className="site-shell flex items-stretch h-14 relative z-[100] bg-white">
         {/* Logo */}
         <Link
           to="/"

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import ProjectCard from '../components/ProjectCard';
+import SelectedWork from '../components/SelectedWork';
 import MarqueeBar from '../components/MarqueeBar';
 import { Link } from 'react-router-dom';
 import { useCaseStudies } from '../hooks/useSupabaseData';
@@ -16,7 +16,6 @@ export default function Home() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
-  const projectsRef = useRef<HTMLDivElement>(null);
 
   // ── Hero entrance ────────────────────────────────────────────────────
   useEffect(() => {
@@ -27,52 +26,11 @@ export default function Home() {
     return () => { tl.kill(); };
   }, []);
 
-  // ── Bidirectional scroll animations for project cards ─────────────────
-  useEffect(() => {
-    if (loading || !projectsRef.current) return;
-
-    const cards = projectsRef.current.querySelectorAll('.project-card-wrapper');
-    const triggers: ScrollTrigger[] = [];
-
-    // Set initial hidden state to prevent flash before ScrollTrigger fires
-    gsap.set(cards, { opacity: 0, y: 60, scale: 0.97 });
-
-    cards.forEach((card) => {
-      // ── Enter animation (from bottom) ──
-      const enterTrigger = ScrollTrigger.create({
-        trigger: card,
-        start: 'top 92%',
-        end: 'bottom 8%',
-        onEnter: () => gsap.fromTo(card,
-          { y: 60, opacity: 0, scale: 0.97 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.75, ease: 'power3.out' }
-        ),
-        // ── Exit animation (out the top) ──
-        onLeave: () => gsap.to(card,
-          { y: -40, opacity: 0, scale: 0.97, duration: 0.5, ease: 'power2.in' }
-        ),
-        // ── Re-enter from top (scrolling back down) ──
-        onEnterBack: () => gsap.fromTo(card,
-          { y: -40, opacity: 0, scale: 0.97 },
-          { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' }
-        ),
-        // ── Exit bottom (scrolling back up past it) ──
-        onLeaveBack: () => gsap.to(card,
-          { y: 60, opacity: 0, scale: 0.97, duration: 0.5, ease: 'power2.in' }
-        ),
-      });
-      triggers.push(enterTrigger);
-    });
-
-    return () => { triggers.forEach(t => t.kill()); };
-  }, [loading, projects]);
-
-
   return (
     <main className="pt-14">
       {/* ── Hero Section ─────────────────────────────────────────────── */}
       <section ref={heroRef} className="min-h-[90vh] flex flex-col justify-end border-b-2 border-[#0a0a0a]">
-        <div className="max-w-[1400px] mx-auto w-full">
+        <div className="site-shell w-full">
           {/* Top meta bar */}
           <div ref={metaRef} className="flex items-center border-b-2 border-[#0a0a0a] px-6 py-3">
             <span className="font-mono text-xs text-[#666] uppercase tracking-widest">
@@ -131,7 +89,7 @@ export default function Home() {
       <MarqueeBar />
 
       {/* ── Case Studies ─────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto">
+      <section className="site-shell">
         {/* Section header */}
         <div className="flex items-center justify-between px-6 py-6 border-b-2 border-[#0a0a0a]">
           <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
@@ -142,36 +100,12 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Cards */}
-        <div ref={projectsRef}>
-          {loading ? (
-            // Skeleton
-            [0, 1, 2].map((i) => (
-              <div key={i} className="project-card-wrapper border-b-2 border-[#0a0a0a]">
-                <div className="flex flex-col lg:flex-row h-[300px] animate-pulse">
-                  <div className="lg:w-[55%] bg-[#f0f0f0]" />
-                  <div className="lg:w-[45%] p-8 space-y-4">
-                    <div className="h-3 bg-[#f0f0f0] w-24" />
-                    <div className="h-8 bg-[#f0f0f0] w-3/4" />
-                    <div className="h-4 bg-[#f0f0f0] w-full" />
-                    <div className="h-4 bg-[#f0f0f0] w-2/3" />
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            projects.map((project, i) => (
-              <div key={project.id} className="project-card-wrapper border-b-2 border-[#0a0a0a]">
-                <ProjectCard project={project} index={i} />
-              </div>
-            ))
-          )}
-        </div>
+        <SelectedWork projects={projects} loading={loading} />
       </section>
 
       {/* ── CTA Strip ────────────────────────────────────────────────── */}
       <section className="border-t-2 border-[#0a0a0a] bg-[#0a0a0a] text-white">
-        <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between px-6 py-12 gap-6">
+        <div className="site-shell flex flex-col md:flex-row items-center justify-between px-6 py-12 gap-6">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-[#666] mb-2">
               Let's collaborate
@@ -184,7 +118,7 @@ export default function Home() {
           </div>
           <Link
             to="/contact"
-            className="btn-brutal-filled border-white text-white hover:bg-white hover:text-[#0a0a0a] font-mono text-sm py-4 px-8 whitespace-nowrap"
+            className="btn-brutal border-white font-mono text-sm py-4 px-8 whitespace-nowrap"
           >
             Get In Touch →
           </Link>

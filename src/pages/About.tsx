@@ -128,7 +128,7 @@ export default function About() {
   return (
     <main className="pt-14">
       {/* ── Page Header ──────────────────────────────────────────────── */}
-      <div className="border-b-2 border-[#0a0a0a] max-w-[1400px] mx-auto">
+      <div className="border-b-2 border-[#0a0a0a] site-shell">
         <div className="px-6 py-4 border-b-2 border-[#0a0a0a]">
           <span className="label-mono">About</span>
         </div>
@@ -140,7 +140,7 @@ export default function About() {
       </div>
 
       {/* ── Bio + Sticky Image ────────────────────────────────────────── */}
-      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row border-b-2 border-[#0a0a0a]">
+      <div className="site-shell flex flex-col lg:flex-row border-b-2 border-[#0a0a0a]">
         {/* Bio — Left */}
         <div ref={bioRef} className="flex-1 border-b-2 lg:border-b-0 lg:border-r-2 border-[#0a0a0a]">
           {/* Name block */}
@@ -255,7 +255,7 @@ export default function About() {
       </div>
 
       {/* ── Work Experience ───────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         {/* Section header */}
         <div className="flex items-center justify-between px-6 py-5 border-b-2 border-[#0a0a0a]">
           <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
@@ -317,7 +317,7 @@ export default function About() {
       </section>
 
       {/* ── Education ─────────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         <div className="flex items-center justify-between px-6 py-5 border-b-2 border-[#0a0a0a]">
           <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
              Education

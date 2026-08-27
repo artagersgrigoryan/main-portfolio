@@ -160,7 +160,7 @@ export default function CaseStudyFury() {
   return (
     <main ref={mainRef} className="pt-14">
       {/* ── Hero ───────────────────────────────────────────────────────── */}
-      <div ref={heroRef} className="border-b-2 border-[#0a0a0a] max-w-[1400px] mx-auto">
+      <div ref={heroRef} className="border-b-2 border-[#0a0a0a] site-shell">
         <div className="flex items-center justify-between px-6 py-4 border-b-2 border-[#0a0a0a]">
           <span className="label-mono">Case Study · UI Design · iGaming</span>
           <Link
@@ -217,7 +217,7 @@ export default function CaseStudyFury() {
       </div>
 
       {/* ── 01 The Problem ─────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         <SectionHeader num="01" title="The Problem" />
         <div className="px-6 py-10">
           <p className="cs-reveal text-lg md:text-xl leading-relaxed max-w-3xl">
@@ -239,7 +239,7 @@ export default function CaseStudyFury() {
       </section>
 
       {/* ── 02 My Approach ─────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         <SectionHeader num="02" title="My Approach" />
         <div className="px-6 py-10 space-y-14">
           {/* System first */}
@@ -499,7 +499,7 @@ export default function CaseStudyFury() {
       </section>
 
       {/* ── 03 The 8 Games ─────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         <SectionHeader num="03" title="The 8 Games" />
         <div className="px-6 py-10">
           <p className="cs-reveal text-base text-[#333] leading-relaxed max-w-3xl mb-12">
@@ -522,7 +522,7 @@ export default function CaseStudyFury() {
       </section>
 
       {/* ── 04 The Result ──────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         <SectionHeader num="04" title="The Result" />
         <div className="cs-reveal grid grid-cols-1 md:grid-cols-3 border-b-2 border-[#0a0a0a]">
           {STATS.map(({ big, label }, i) => (
@@ -561,7 +561,7 @@ export default function CaseStudyFury() {
       </section>
 
       {/* ── CTA ────────────────────────────────────────────────────────── */}
-      <section className="max-w-[1400px] mx-auto border-b-2 border-[#0a0a0a]">
+      <section className="site-shell border-b-2 border-[#0a0a0a]">
         <div className="cs-reveal px-6 py-16 md:py-24 text-center">
           <p className="label-mono mb-4">Artagers Grigoryan</p>
           <h2 className="text-3xl md:text-5xl font-bold uppercase tracking-tight">

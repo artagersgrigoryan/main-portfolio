@@ -58,7 +58,7 @@ export default function Contact() {
   return (
     <main className="pt-14 min-h-screen flex flex-col">
       {/* ── Page Header ──────────────────────────────────────────────── */}
-      <div ref={headerRef} className="border-b-2 border-[#0a0a0a] max-w-[1400px] mx-auto w-full">
+      <div ref={headerRef} className="border-b-2 border-[#0a0a0a] site-shell w-full">
         <div className="px-6 py-4 border-b-2 border-[#0a0a0a]">
           <span className="label-mono">Contact</span>
         </div>
@@ -83,7 +83,7 @@ export default function Contact() {
       </div>
 
       {/* ── Main Content ─────────────────────────────────────────────── */}
-      <div className="flex-1 max-w-[1400px] mx-auto w-full flex flex-col lg:flex-row border-b-2 border-[#0a0a0a]">
+      <div className="flex-1 site-shell w-full flex flex-col lg:flex-row border-b-2 border-[#0a0a0a]">
         {/* Contact Links — Left */}
         <div ref={linksRef} className="lg:w-[380px] xl:w-[420px] border-b-2 lg:border-b-0 lg:border-r-2 border-[#0a0a0a]">
           <div className="px-6 py-5 border-b-2 border-[#0a0a0a]">
