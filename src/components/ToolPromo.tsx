@@ -12,8 +12,8 @@ const PROMPTSTATION_URL =
  */
 export default function ToolPromo() {
   return (
-    <section className="border-t-2 border-[#0a0a0a] bg-[#f8f8f8]">
-      <div className="site-shell flex flex-col lg:flex-row items-start lg:items-center gap-8 px-6 py-12">
+    <section className="bg-[#f8f8f8] section-quiet">
+      <div className="site-shell flex flex-col lg:flex-row items-start lg:items-end gap-10 px-6">
         <div className="flex-1">
           <p className="label-mono mb-3">Free tool</p>
           <h2 className="heading-section">

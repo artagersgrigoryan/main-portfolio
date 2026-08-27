@@ -17,32 +17,41 @@ const STEPS = [
   },
 ];
 
-/** How working together actually goes. Predictability substitutes for testimonials. */
+/**
+ * How working together actually goes. Predictability substitutes for testimonials.
+ *
+ * Quiet section: no cells, no rules. The steps are a real sequence, so they run
+ * vertically with hanging numbers — four equal boxes side by side said nothing
+ * about order. The narrow measure against a full-bleed page is itself a weight
+ * signal: this section is meant to be read, not scanned.
+ */
 export default function ProcessSteps() {
   return (
-    <section className="border-t-2 border-[#0a0a0a]">
-      <div className="site-shell">
-        <div className="px-6 py-6 border-b-2 border-[#0a0a0a]">
-          <h2 className="heading-section">How I work</h2>
-        </div>
-        <div className="flex flex-col md:flex-row">
+    <section className="section-quiet">
+      <div className="site-shell px-6">
+        <p className="label-mono mb-3">Process</p>
+        <h2 className="heading-section">How I work</h2>
+
+        <ol className="mt-12 md:mt-16 max-w-3xl">
           {STEPS.map((step, i) => (
-            <div
-              key={step.title}
-              className={`flex-1 px-6 py-8 border-[#0a0a0a] ${i < STEPS.length - 1 ? 'border-b-2 md:border-b-0 md:border-r-2' : ''}`}
-            >
-              <p className="font-mono text-xs tracking-widest text-[#999]">
+            <li key={step.title} className="flex gap-6 md:gap-10 py-6 md:py-8">
+              <span
+                aria-hidden
+                className="font-mono text-sm text-[#bbb] shrink-0 w-8 pt-1.5"
+              >
                 {String(i + 1).padStart(2, '0')}
-              </p>
-              <h3 className="text-lg font-bold uppercase tracking-tight mt-3 leading-tight">
-                {step.title}
-              </h3>
-              <p className="text-sm text-[#444] leading-relaxed font-light mt-2">
-                {step.body}
-              </p>
-            </div>
+              </span>
+              <div>
+                <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight leading-tight">
+                  {step.title}
+                </h3>
+                <p className="text-base text-[#444] leading-relaxed font-light mt-2 max-w-xl">
+                  {step.body}
+                </p>
+              </div>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );

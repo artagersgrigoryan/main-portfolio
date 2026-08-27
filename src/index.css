@@ -261,3 +261,12 @@ select:focus {
   background: transparent;
   color: #ffffff;
 }
+/* ── Section rhythm ───────────────────────────────────────────────────────
+   Loosened grid: quiet sections are divided by space rather than rules, so
+   their vertical padding has to carry the separation the borders used to.
+   Borders are now an emphasis signal — only the work list and the offer
+   block still use them, which is what makes those two read as important. */
+.section-quiet {
+  padding-top: clamp(4.5rem, 9vw, 8rem);
+  padding-bottom: clamp(4.5rem, 9vw, 8rem);
+}

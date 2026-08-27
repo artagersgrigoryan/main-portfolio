@@ -46,106 +46,86 @@ export default function Home() {
 
   return (
     <main className="pt-14">
-      {/* ── Hero Section ─────────────────────────────────────────────── */}
-      <section ref={heroRef} className="min-h-[90vh] flex flex-col justify-end border-b-2 border-[#0a0a0a]">
-        <div className="site-shell w-full">
-          {/* Top meta bar */}
-          <div ref={metaRef} className="flex items-center border-b-2 border-[#0a0a0a] px-6 py-3">
-            <span className="font-mono text-xs text-[#666] uppercase tracking-widest">
-              Product Designer
-            </span>
-            <span className="mx-4 text-[#ccc]">|</span>
-            <span className="font-mono text-xs text-[#666] uppercase tracking-widest">
-              Yerevan, Armenia
-            </span>
-            <span className="ml-auto font-mono text-xs text-[#666] uppercase tracking-widest">
-              {CAPACITY} ◉
-            </span>
+      {/* ── Hero ─────────────────────────────────────────────────────────
+          Quiet section. Four elements and nothing else: capacity, headline,
+          one sentence, one pair of buttons. The stack columns that used to sit
+          here moved into the offer tiers — they were the least important
+          content on the page occupying two thirds of its most valuable space. */}
+      <section ref={heroRef} className="min-h-[88vh] flex flex-col justify-end">
+        <div className="site-shell w-full px-6 pb-20 md:pb-28">
+          <div
+            ref={metaRef}
+            className="font-mono text-xs uppercase tracking-widest flex flex-wrap items-center gap-x-4 gap-y-1 mb-12 md:mb-16"
+          >
+            <span className="text-[#666]">Product Designer</span>
+            <span aria-hidden className="text-[#ccc]">/</span>
+            <span className="text-[#666]">Yerevan, Armenia</span>
+            <span aria-hidden className="text-[#ccc]">/</span>
+            <span className="text-[#0a0a0a]">{CAPACITY} ◉</span>
           </div>
 
-          {/* Main heading */}
-          <div className="px-6 py-16 md:py-24 border-b-2 border-[#0a0a0a]">
-            <h1
-              ref={headingRef}
-              className="text-[clamp(3rem,10vw,9rem)] font-bold leading-[0.9] tracking-[-0.03em] uppercase"
-            >
-              From Problem
-              <br />
-              To <span className="inline-block border-b-[6px] border-[#0a0a0a]">Production</span>
-            </h1>
-          </div>
+          <h1
+            ref={headingRef}
+            className="text-[clamp(3rem,10vw,9rem)] font-bold leading-[0.9] tracking-[-0.03em] uppercase"
+          >
+            From Problem
+            <br />
+            To <span className="inline-block border-b-[6px] border-[#0a0a0a]">Production</span>
+          </h1>
 
-          {/* Sub section */}
-          <div ref={subRef} className="flex flex-col md:flex-row">
-            <div className="flex-1 px-6 py-8 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
-              <p className="text-base md:text-lg text-[#444] leading-relaxed max-w-lg font-light">
-                I'm Artagers Grigoryan — product designer for iGaming, Web3 and
-                data-heavy platforms. I design the product, and when you need it
-                live rather than just drawn, I build and ship the front-end myself.
-              </p>
-              <div className="flex flex-wrap items-center gap-4 mt-8">
-                <Link
-                  to="/contact"
-                  className="btn-brutal-primary"
-                  onClick={() => trackEvent('cta_start_project', { location: 'hero' })}
-                >
-                  Start a project →
-                </Link>
-                <a
-                  href="#work"
-                  className="btn-brutal font-mono text-sm"
-                  onClick={(e) => {
-                    const target = document.getElementById('work');
-                    if (lenis && target) {
-                      e.preventDefault();
-                      lenis.scrollTo(target);
-                    }
-                  }}
-                >
-                  See the work
-                </a>
-              </div>
-            </div>
-            <div className="flex-1 px-6 py-8 border-b-2 md:border-b-0 md:border-r-2 border-[#0a0a0a]">
-              <p className="label-mono mb-2">Design</p>
-              <p className="font-mono text-sm">
-                Figma · Webflow · Tilda
-                <br />
-                Adobe CC · Illustrator · After Effects
-              </p>
-            </div>
-            <div className="flex-1 px-6 py-8">
-              <p className="label-mono mb-2">Build</p>
-              <p className="font-mono text-sm">
-                Next.js · React · TypeScript
-                <br />
-                Node · PostgreSQL · Prisma · Vercel
-              </p>
+          <div ref={subRef} className="mt-10 md:mt-14 max-w-2xl">
+            <p className="text-lg md:text-xl text-[#444] leading-relaxed font-light">
+              I'm Artagers Grigoryan — product designer for iGaming, Web3 and
+              data-heavy platforms. I design the product, and when you need it
+              live rather than just drawn, I build and ship the front-end myself.
+            </p>
+            <div className="flex flex-wrap items-center gap-4 mt-10">
+              <Link
+                to="/contact"
+                className="btn-brutal-primary"
+                onClick={() => trackEvent('cta_start_project', { location: 'hero' })}
+              >
+                Start a project →
+              </Link>
+              <a
+                href="#work"
+                className="btn-brutal font-mono text-sm"
+                onClick={(e) => {
+                  const target = document.getElementById('work');
+                  if (lenis && target) {
+                    e.preventDefault();
+                    lenis.scrollTo(target);
+                  }
+                }}
+              >
+                See the work
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* ── Proof strip ──────────────────────────────────────────────────
-          Four figures, each traceable to something a visitor can open. */}
-      <section className="border-b-2 border-[#0a0a0a]">
-        <div className="site-shell flex flex-col md:flex-row">
-          {[
-            { figure: '4+ years', detail: 'Product design' },
-            { figure: '8 games', detail: 'One UI system, zero dev revisions' },
-            { figure: '3 platforms', detail: 'Web, iOS, Android' },
-            { figure: 'Full-stack', detail: 'Next.js · Node · Postgres · Prisma' },
-          ].map((item, i) => (
-            <div
-              key={item.figure}
-              className={`flex-1 px-6 py-8 border-[#0a0a0a] ${i < 3 ? 'border-b-2 md:border-b-0 md:border-r-2' : ''}`}
-            >
-              <p className="text-2xl lg:text-3xl font-bold uppercase leading-none tracking-tight">
-                {item.figure}
-              </p>
-              <p className="label-mono mt-2">{item.detail}</p>
-            </div>
-          ))}
+          Quiet section. Four figures, each traceable to something a visitor
+          can open. Unboxed and larger: as a bordered row it read as a table
+          of specifications rather than as evidence. */}
+      <section className="section-quiet">
+        <div className="site-shell px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+            {[
+              { figure: '4+ years', detail: 'Product design' },
+              { figure: '8 games', detail: 'One UI system, zero dev revisions' },
+              { figure: '3 platforms', detail: 'Web, iOS, Android' },
+              { figure: 'Full-stack', detail: 'Next.js · Node · Postgres · Prisma' },
+            ].map((item) => (
+              <div key={item.figure}>
+                <p className="text-3xl lg:text-5xl font-bold uppercase leading-none tracking-tight">
+                  {item.figure}
+                </p>
+                <p className="label-mono mt-3 leading-relaxed">{item.detail}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -153,7 +133,7 @@ export default function Home() {
       <MarqueeBar />
 
       {/* ── Case Studies ─────────────────────────────────────────────── */}
-      <section id="work" className="site-shell">
+      <section id="work" className="site-shell pt-16 md:pt-24">
         {/* Section header */}
         <div className="flex items-center justify-between px-6 py-6 border-b-2 border-[#0a0a0a]">
           <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
