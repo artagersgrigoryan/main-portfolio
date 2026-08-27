@@ -22,6 +22,9 @@ export const TIMELINES = ['ASAP', '1–3 months', '3+ months', 'Just exploring']
 
 export const BUDGETS = ['Under $2k', '$2–5k', '$5–15k', '$15k+', 'Not sure yet'] as const;
 
+/** Telegram rejects any sendMessage payload over this length outright. */
+export const TELEGRAM_MAX_CHARS = 4096;
+
 export interface Brief {
   name: string;
   email: string;
@@ -83,6 +86,14 @@ export function validateBrief(body: unknown): ValidationResult {
     !inList(brief.budget, BUDGETS)
   ) {
     return { ok: false, error: 'Invalid selection' };
+  }
+
+  // The per-field caps can sum past Telegram's limit once MarkdownV2 escaping
+  // adds backslashes, so check the message we will actually send rather than
+  // its parts. Without this, a brief validates, Telegram rejects it, and the
+  // visitor sees only a generic error — a silently lost lead.
+  if (formatBriefMessage(brief).length > TELEGRAM_MAX_CHARS) {
+    return { ok: false, error: 'Brief too long — please shorten it' };
   }
 
   return { ok: true, value: brief };

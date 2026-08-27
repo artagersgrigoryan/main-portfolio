@@ -47,6 +47,29 @@ describe('validateBrief', () => {
   it('rejects a non-object body', () => {
     expect(validateBrief(null)).toEqual({ ok: false, error: 'Missing required fields' });
   });
+
+  it('rejects a brief whose formatted message would exceed the Telegram limit', () => {
+    // Each field sits exactly at (or under) its own individual cap — name<=100,
+    // email<=200, links<=500, message<=3900 — so the earlier per-field length
+    // check passes and this exercises the new combined-length check instead.
+    const result = validateBrief({
+      ...valid,
+      name: 'x'.repeat(100),
+      email: `${'x'.repeat(188)}@example.com`,
+      links: 'x'.repeat(500),
+      message: 'x'.repeat(3900),
+    });
+    expect(result).toEqual({ ok: false, error: 'Brief too long — please shorten it' });
+  });
+
+  it('accepts a realistically long brief', () => {
+    const result = validateBrief({
+      ...valid,
+      links: 'https://example.com '.repeat(5),
+      message: 'x'.repeat(2500),
+    });
+    expect(result.ok).toBe(true);
+  });
 });
 
 describe('formatBriefMessage', () => {
@@ -64,5 +87,15 @@ describe('formatBriefMessage', () => {
     const text = formatBriefMessage(result.value);
     expect(text).not.toContain('Timeline');
     expect(text).not.toContain('Budget');
+  });
+
+  it('escapes every MarkdownV2 reserved character', () => {
+    const reserved = '_*[]()~`>#+-=|{}.!\\';
+    const result = validateBrief({ ...valid, message: reserved });
+    if (!result.ok) throw new Error('fixture should validate');
+    const text = formatBriefMessage(result.value);
+    for (const ch of reserved) {
+      expect(text).toContain(`\\${ch}`);
+    }
   });
 });

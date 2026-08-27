@@ -18,6 +18,7 @@ export default function Contact() {
   });
   const [started, setStarted] = useState(false);
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const markStarted = () => {
     if (started) return;
@@ -43,7 +44,10 @@ export default function Contact() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error('Server error');
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || 'Server error');
+      }
 
       trackEvent('brief_submitted', {
         projectType: formData.projectType,
@@ -55,7 +59,8 @@ export default function Contact() {
         name: '', email: '', projectType: '', need: '',
         timeline: '', budget: '', links: '', message: '',
       });
-    } catch {
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : '');
       setStatus('error');
       setTimeout(() => setStatus('idle'), 4000);
     }
@@ -248,7 +253,7 @@ export default function Contact() {
               )}
               {status === 'error' && (
                 <p className="font-mono text-xs text-red-600 uppercase tracking-widest">
-                  Something went wrong. Please try again.
+                  {errorMessage || 'Something went wrong. Please try again.'}
                 </p>
               )}
             </div>
