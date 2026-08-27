@@ -219,6 +219,23 @@ Drop-off is derived as `brief_started` minus `brief_submitted`; no per-field ins
 - **Per-page meta descriptions and OG tags** — none currently exist; pages set only `document.title` via `useEffect`.
 - **`robots.txt` and `sitemap.xml`** — add `/hire`, `/work/telegram-mini-app-games`.
 
+## 11b. Visual scope
+
+**Decision: structure and copy only.** The existing brutalist system is kept as-is and the visual redesign is deferred until the funnel produces data. Rationale: the system is coherent and distinctive — it is an asset, not a liability — and redesigning on guesswork before any conversion data exists optimises blind.
+
+Two changes ship anyway, because they are structural consequences of the new sections rather than restyling:
+
+1. **Primary CTA emphasis.** `src/pages/Home.tsx:114` currently uses `.btn-brutal` — the outlined, lowest-emphasis variant — on the black CTA strip. It becomes the filled variant at a larger size. No change to the visual language; the emphasis simply stops being inverted.
+2. **A mid-level type step.** The scale currently jumps from a `clamp(3rem, 10vw, 9rem)` hero to 11px uppercase mono labels with nothing between. The new page has six section headers and needs a third step. One addition to `src/index.css`, in the existing idiom.
+
+**Explicitly deferred to the later redesign pass:**
+
+- An accent colour for public pages. `#f5c842` exists but is quarantined in Admin; a sales page benefits from exactly one accent for emphasis. Deferred by decision, not oversight.
+- The uniform-weight problem: `.border-brutal`, `.grid-line-v` and `.grid-line-h` are all 2px, so every element carries identical visual weight and the page offers the eye no path. Acceptable for a browsing portfolio, suboptimal for a guided sales page.
+- Section rhythm and spacing hierarchy.
+
+Sequencing when the redesign happens: direction first (system rules), execution during section work, polish last. Never "redesign then re-content" — form follows content, and the content is what changes here.
+
 ## 12. Out of scope
 
 New case studies · SEO service pages · schema markup · calendar booking · prerendering · email capture inside PromptStation · testimonial collection.
