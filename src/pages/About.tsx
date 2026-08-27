@@ -5,9 +5,9 @@ import { usePageMeta } from '../hooks/usePageMeta';
 import { trackEvent } from '../lib/analytics';
 
 const HOBBIES = [
-  { emoji: '🧩', label: "Rubik's Cube", note: '30-second solve' },
-  { emoji: '⌨️', label: 'Blind Typing', note: '60 WPM' },
-  { emoji: '💻', label: 'Building things', note: 'Shipped side projects' },
+  {label: "Rubik's Cube", note: '30-second solve' },
+  {label: 'Blind Typing', note: '60 WPM' },
+  {label: 'Building things', note: 'Shipped side projects' },
 ];
 
 export default function About() {
@@ -147,9 +147,8 @@ export default function About() {
             {/* Hobbies */}
             <div className="border-t-2 border-[#0a0a0a] p-6">
               <p className="label-mono mb-4">Off the Clock</p>
-              {HOBBIES.map(({ emoji, label, note }) => (
+              {HOBBIES.map(({ label, note }) => (
                 <div key={label} className="flex items-center gap-3 mb-3">
-                  <span className="text-lg">{emoji}</span>
                   <div>
                     <span className="font-mono text-xs font-bold uppercase tracking-wide">{label}</span>
                     <span className="font-mono text-xs text-[#666] ml-2">— {note}</span>

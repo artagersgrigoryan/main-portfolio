@@ -270,3 +270,28 @@ select:focus {
   padding-top: clamp(4.5rem, 9vw, 8rem);
   padding-bottom: clamp(4.5rem, 9vw, 8rem);
 }
+
+/* ── Portrait plate ───────────────────────────────────────────────────────
+   The hero portrait ships as a 1-bit dither — a printed plate — and resolves
+   into the photograph on hover. Print → real, which is the same argument the
+   headline makes. Gated to fine pointers: touch devices never hover, so the
+   printed state has to stand on its own, and it does. */
+.portrait-plate__photo {
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .portrait-plate__photo {
+    transition: opacity 0.45s ease;
+  }
+
+  .portrait-plate:hover .portrait-plate__photo {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait-plate__photo {
+    transition: none;
+  }
+}

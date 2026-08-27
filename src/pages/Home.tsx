@@ -34,13 +34,15 @@ export default function Home() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLElement>(null);
 
   // ── Hero entrance ────────────────────────────────────────────────────
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
     tl.fromTo(headingRef.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
       .fromTo(subRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.5')
-      .fromTo(metaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, '-=0.3');
+      .fromTo(metaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, '-=0.3')
+      .fromTo(plateRef.current, { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.4');
     return () => { tl.kill(); };
   }, []);
 
@@ -53,6 +55,8 @@ export default function Home() {
           content on the page occupying two thirds of its most valuable space. */}
       <section ref={heroRef} className="min-h-[88vh] flex flex-col justify-end">
         <div className="site-shell w-full px-6 pb-20 md:pb-28">
+          <div className="grid lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-14 lg:gap-16 items-end">
+          <div>
           <div
             ref={metaRef}
             className="font-mono text-xs uppercase tracking-widest flex flex-wrap items-center gap-x-4 gap-y-1 mb-12 md:mb-16"
@@ -66,7 +70,7 @@ export default function Home() {
 
           <h1
             ref={headingRef}
-            className="text-[clamp(3rem,10vw,9rem)] font-bold leading-[0.9] tracking-[-0.03em] uppercase"
+            className="text-[clamp(3rem,10vw,9rem)] lg:text-[clamp(3rem,6.6vw,6.5rem)] font-bold leading-[0.9] tracking-[-0.03em] uppercase"
           >
             From Problem
             <br />
@@ -101,6 +105,36 @@ export default function Home() {
                 See the work
               </a>
             </div>
+          </div>
+          </div>
+
+          {/* Portrait plate. Sits in the column that was already empty, so it
+              costs the hero no hierarchy. Default state is a 1-bit dither —
+              a printed plate — which resolves into the photograph on hover.
+              Touch devices never hover, so the printed state is the one most
+              visitors see; it has to work on its own. */}
+          <figure ref={plateRef} className="portrait-plate hidden lg:block m-0">
+            <div className="relative border-2 border-[#0a0a0a] bg-[#0a0a0a] overflow-hidden">
+              <img
+                src="/portrait-print.png"
+                alt="Artagers Grigoryan"
+                width={900}
+                height={1125}
+                className="block w-full"
+              />
+              <img
+                src="/portrait-photo.jpg"
+                alt=""
+                aria-hidden
+                width={900}
+                height={1125}
+                className="portrait-plate__photo absolute inset-0 block w-full h-full object-cover"
+              />
+            </div>
+            <figcaption className="label-mono mt-3">
+              Artagers Grigoryan · Yerevan
+            </figcaption>
+          </figure>
           </div>
         </div>
       </section>
