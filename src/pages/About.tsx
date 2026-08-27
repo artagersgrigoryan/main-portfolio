@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { trackEvent } from '../lib/analytics';
 
 const HOBBIES = [
   { emoji: '🧩', label: "Rubik's Cube", note: '30-second solve' },
@@ -78,13 +79,15 @@ export default function About() {
             </p>
             <p className="text-base leading-relaxed text-[#333]">
               I believe the best design is invisible — it gets out of the user's way
-              and lets the product do the talking.
+              and lets the product do the talking. I came to product design from fine
+              art, which is still why I care what things look like as much as whether
+              they work.
             </p>
           </div>
 
           {/* Tech stack */}
           <div className="px-6 py-8">
-            <p className="label-mono mb-4">Technical Stack</p>
+            <p className="label-mono mb-4">Design Tools</p>
             <div className="flex flex-wrap gap-2">
               {[
                 'Figma', 'Components & Variables', 'Webflow', 'Tilda',
@@ -98,6 +101,19 @@ export default function About() {
                 </span>
               ))}
             </div>
+            <p className="label-mono mt-6 mb-2">Build</p>
+            <p className="font-mono text-sm">
+              Next.js · React · TypeScript
+              <br />
+              Node · PostgreSQL · Prisma · Vercel
+            </p>
+            <Link
+              to="/contact"
+              className="btn-brutal-primary inline-block mt-8"
+              onClick={() => trackEvent('cta_start_project', { location: 'about' })}
+            >
+              Start a project →
+            </Link>
             <p className="font-mono text-xs text-[#666] uppercase tracking-widest mt-8">
               Hiring rather than commissioning? <Link to="/hire" className="underline">See the CV →</Link>
             </p>

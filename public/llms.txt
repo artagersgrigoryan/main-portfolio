@@ -1,6 +1,6 @@
 # Artagers Grigoryan — Product Designer who ships
 
-> Product designer with 4+ years across iGaming, Web3, fintech and mobility, who also builds and deploys production front-ends. Designs the product, and ships the working interface when a client needs it live rather than drawn. Founder of PromptStation. Based in Yerevan, Armenia; works remotely worldwide.
+> Product designer with 4+ years across iGaming, Web3 and mobility, who also builds and deploys production front-ends. Designs the product, and ships the working interface when a client needs it live rather than drawn. Founder of PromptStation. Based in Yerevan, Armenia; works remotely worldwide.
 
 ## Contact
 
@@ -52,8 +52,8 @@ https://www.behance.net/gallery/222825727/OneRide-Mobile-App
 ## Experience
 
 - Product Designer, UXCentury — casino and custom game platforms, betting dashboards, Telegram-ecosystem games.
-- Freelance UX/UI Designer, 2022–present — blockchain gaming and lottery platforms, Telegram bot onboarding flows.
-- Founder & Head of Product, OneRide — see above.
+- Freelance UX/UI Designer, 2020–present — blockchain gaming and lottery platforms, Telegram bot onboarding flows.
+- Founder & Head of Design, OneRide — see above.
 - UX/UI Mentor, EIF (Enterprise Incubator Foundation) — mentored cohorts in UX/UI, web design and Figma.
 - UX/UI Designer, TechMind — user research, usability testing, wireframes and prototypes.
 - Co-Founder & UX/UI Designer, UnityX — design studio for mobile and web clients.

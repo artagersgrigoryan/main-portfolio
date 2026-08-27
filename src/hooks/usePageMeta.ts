@@ -32,5 +32,7 @@ export function usePageMeta({ title, description, path }: PageMeta): void {
     setTag('meta[property="og:url"]', { property: 'og:url', content: url });
     setTag('meta[property="og:type"]', { property: 'og:type', content: 'website' });
     setTag('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
+    setTag('meta[property="twitter:title"]', { property: 'twitter:title', content: title });
+    setTag('meta[property="twitter:description"]', { property: 'twitter:description', content: description });
   }, [title, description, path]);
 }

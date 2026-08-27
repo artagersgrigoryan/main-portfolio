@@ -164,7 +164,7 @@ export default function Contact() {
         {/* Contact Form — Right */}
         <div className="flex-1">
           <div className="px-6 py-5 border-b-2 border-[#0a0a0a]">
-            <p className="label-mono">Send a Message</p>
+            <p className="label-mono">The Brief</p>
           </div>
 
           <form
@@ -174,12 +174,14 @@ export default function Contact() {
           >
             {/* Name */}
             <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-              <label className="block px-4 pt-4 label-mono">
+              <label htmlFor="brief-name" className="block px-4 pt-4 label-mono">
                 Your Name *
               </label>
               <input
+                id="brief-name"
                 type="text"
                 required
+                autoComplete="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 onFocus={markStarted}
@@ -190,12 +192,14 @@ export default function Contact() {
 
             {/* Email */}
             <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-              <label className="block px-4 pt-4 label-mono">
+              <label htmlFor="brief-email" className="block px-4 pt-4 label-mono">
                 Email Address *
               </label>
               <input
+                id="brief-email"
                 type="email"
                 required
+                autoComplete="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 onFocus={markStarted}
@@ -204,18 +208,19 @@ export default function Contact() {
               />
             </div>
 
-            <BriefSelect label="Project type" value={formData.projectType} options={PROJECT_TYPES} required
+            <BriefSelect id="brief-project-type" label="Project type" value={formData.projectType} options={PROJECT_TYPES} required
               onChange={(v) => setFormData({ ...formData, projectType: v })} onFocus={markStarted} />
-            <BriefSelect label="What you need" value={formData.need} options={NEEDS} required
+            <BriefSelect id="brief-need" label="What you need" value={formData.need} options={NEEDS} required
               onChange={(v) => setFormData({ ...formData, need: v })} onFocus={markStarted} />
-            <BriefSelect label="Timeline" value={formData.timeline} options={TIMELINES}
+            <BriefSelect id="brief-timeline" label="Timeline" value={formData.timeline} options={TIMELINES}
               onChange={(v) => setFormData({ ...formData, timeline: v })} onFocus={markStarted} />
-            <BriefSelect label="Budget range" value={formData.budget} options={BUDGETS}
+            <BriefSelect id="brief-budget" label="Budget range" value={formData.budget} options={BUDGETS}
               onChange={(v) => setFormData({ ...formData, budget: v })} onFocus={markStarted} />
 
             <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-              <label className="block px-4 pt-4 label-mono">Links</label>
+              <label htmlFor="brief-links" className="block px-4 pt-4 label-mono">Links</label>
               <input
+                id="brief-links"
                 type="text"
                 value={formData.links}
                 onChange={(e) => setFormData({ ...formData, links: e.target.value })}
@@ -227,10 +232,11 @@ export default function Contact() {
 
             {/* Message */}
             <div className="border-2 border-[#0a0a0a]">
-              <label className="block px-4 pt-4 label-mono">
+              <label htmlFor="brief-message" className="block px-4 pt-4 label-mono">
                 Message *
               </label>
               <textarea
+                id="brief-message"
                 required
                 rows={8}
                 value={formData.message}
@@ -248,12 +254,12 @@ export default function Contact() {
                 disabled={status === 'sending'}
                 className="btn-brutal-primary disabled:opacity-50"
               >
-                {status === 'sending' ? 'Sending...' : status === 'sent' ? 'Sent ✓' : 'Send Message →'}
+                {status === 'sending' ? 'Sending...' : status === 'sent' ? 'Sent ✓' : 'Send the brief →'}
               </button>
 
               {status === 'sent' && (
                 <p className="font-mono text-xs text-green-700 uppercase tracking-widest max-w-sm leading-relaxed">
-                  Brief received. I read every one personally and reply within 24 hours — usually sooner.
+                  Brief received. I read every one personally and reply within 24 hours — usually sooner. If it's urgent, message me on Telegram.
                 </p>
               )}
               {status === 'error' && (
@@ -270,8 +276,9 @@ export default function Contact() {
 }
 
 function BriefSelect({
-  label, value, options, required, onChange, onFocus,
+  id, label, value, options, required, onChange, onFocus,
 }: {
+  id: string;
   label: string;
   value: string;
   options: readonly string[];
@@ -281,10 +288,11 @@ function BriefSelect({
 }) {
   return (
     <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-      <label className="block px-4 pt-4 label-mono">
+      <label htmlFor={id} className="block px-4 pt-4 label-mono">
         {label}{required ? ' *' : ''}
       </label>
       <select
+        id={id}
         required={required}
         value={value}
         onChange={(e) => onChange(e.target.value)}

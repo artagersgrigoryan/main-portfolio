@@ -6,7 +6,7 @@ import { usePageMeta } from '../hooks/usePageMeta';
 const EDUCATION = [
   { school: 'Pixel IT School', field: 'UX/UI Design', type: 'Professional' },
   { school: 'Vanadzor Technology Center', field: 'Graphic Design', type: 'Professional' },
-  { school: 'Tavrizyan Art Collage', field: 'Fine Arts', type: 'Academic' },
+  { school: 'Tavrizyan Art College', field: 'Fine Arts', type: 'Academic' },
 ];
 
 const LANGUAGES = [
@@ -31,7 +31,7 @@ const ARGUMENTS = [
 ];
 
 export default function Hire() {
-  const { data: experience } = useWorkExperience();
+  const { data: experience, loading } = useWorkExperience();
 
   usePageMeta({
     title: 'Hire me — Artagers Grigoryan, Product Designer',
@@ -89,7 +89,13 @@ export default function Hire() {
         <div className="px-6 py-6 border-b-2 border-[#0a0a0a]">
           <h2 className="heading-section">Experience</h2>
         </div>
-        {experience.map((job) => (
+        {loading ? (
+          <div className="px-6 py-8 space-y-4">
+            <div className="h-9 bg-[#f0f0f0] animate-pulse" />
+            <div className="h-9 bg-[#f0f0f0] animate-pulse" />
+            <div className="h-9 bg-[#f0f0f0] animate-pulse" />
+          </div>
+        ) : experience.map((job) => (
           <div key={job.id} className="px-6 py-8 border-b-2 border-[#0a0a0a] last:border-b-0 flex flex-col lg:flex-row gap-4 lg:gap-10">
             <p className="font-mono text-xs text-[#999] uppercase tracking-widest lg:w-48 shrink-0">
               {job.date_range}
@@ -151,12 +157,22 @@ export default function Hire() {
           <h3 className="text-2xl md:text-4xl font-bold leading-none uppercase">
             Hiring? Let's talk.
           </h3>
-          <a
-            href="mailto:artagersgrigoryan@gmail.com"
-            className="btn-brutal-primary-invert whitespace-nowrap"
-          >
-            Email me →
-          </a>
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="mailto:artagersgrigoryan@gmail.com"
+              className="btn-brutal-primary-invert whitespace-nowrap"
+            >
+              Email me →
+            </a>
+            <a
+              href="https://www.linkedin.com/in/artagers-grigoryan/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-brutal whitespace-nowrap"
+            >
+              LinkedIn ↗
+            </a>
+          </div>
         </div>
       </section>
     </main>

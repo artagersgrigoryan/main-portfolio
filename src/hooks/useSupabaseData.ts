@@ -33,7 +33,7 @@ const FALLBACK_CASE_STUDIES: CaseStudy[] = [
     title: 'PromptStation',
     description: 'Answer 13 focused questions. Get a complete, professional website brief — paste it into any AI builder or coding tool. Verified for Bolt, Cursor, v0, Lovable, and Arena.ai.',
     image_url: '/covers/website-prompt-generator.png',
-    link: 'https://www.promptstation.online/en',
+    link: 'https://www.promptstation.online/en?utm_source=artagers_design&utm_medium=portfolio&utm_campaign=work_row',
     tags: ['Vibecode'],
     display_order: 3,
     created_at: '',
