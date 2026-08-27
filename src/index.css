@@ -204,3 +204,60 @@ select:focus {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Section heading ──────────────────────────────────────────────────────
+   The scale jumps from the clamp(3rem,10vw,9rem) hero straight to 11px mono
+   labels with nothing between. The new page has six section headers, so it
+   needs a middle step. */
+.heading-section {
+  font-size: clamp(1.75rem, 3.5vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* ── Primary CTA ──────────────────────────────────────────────────────────
+   The one element allowed to outweigh its neighbours. `.btn-brutal` and
+   `.btn-brutal-filled` share identical 10px/20px padding with every other
+   bordered box, which left the most important control on the page indis-
+   tinguishable from a label. */
+.btn-brutal-primary {
+  border: 2px solid #0a0a0a;
+  background: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 18px 36px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.btn-brutal-primary:hover {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+
+/* Inverted context (the black CTA strip): white fill so the button still
+   dominates rather than receding into an outline. */
+.btn-brutal-primary-invert {
+  border: 2px solid #ffffff;
+  background: #ffffff;
+  color: #0a0a0a;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 18px 36px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.btn-brutal-primary-invert:hover {
+  background: transparent;
+  color: #ffffff;
+}
