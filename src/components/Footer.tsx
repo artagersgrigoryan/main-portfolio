@@ -25,6 +25,12 @@ export default function Footer() {
         {/* Right — Admin link (hidden, in footer) */}
         <div className="flex items-center px-6 py-6">
           <Link
+            to="/hire"
+            className="font-mono text-xs text-[#666] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors mr-6"
+          >
+            For hiring teams
+          </Link>
+          <Link
             to="/admin"
             className="font-mono text-xs text-[#ccc] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors"
           >

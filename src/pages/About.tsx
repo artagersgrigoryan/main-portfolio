@@ -1,35 +1,17 @@
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useWorkExperience } from '../hooks/useSupabaseData';
-
-gsap.registerPlugin(ScrollTrigger);
-
-const EDUCATION = [
-  { school: 'Pixel IT School', field: 'UX/UI Design', type: 'Professional' },
-  { school: 'Vanadzor Technology Center', field: 'Graphic Design', type: 'Professional' },
-  { school: 'Tavrizyan Art Collage', field: 'Fine Arts', type: 'Academic' },
-];
-
-const LANGUAGES = [
-  { lang: 'Armenian', level: 'Native', pct: 100 },
-  { lang: 'Russian', level: 'Fluent', pct: 85 },
-  { lang: 'English', level: 'Conversational', pct: 60 },
-];
 
 const HOBBIES = [
   { emoji: '🧩', label: "Rubik's Cube", note: '30-second solve' },
   { emoji: '⌨️', label: 'Blind Typing', note: '60 WPM' },
-  { emoji: '💻', label: 'Vibe Coding', note: 'Side projects' },
+  { emoji: '💻', label: 'Building things', note: 'Shipped side projects' },
 ];
 
 export default function About() {
   useEffect(() => { document.title = 'About — Artagers Grigoryan'; }, []);
-  const { data: experience, loading } = useWorkExperience();
   const stickyImgRef = useRef<HTMLDivElement>(null);
   const bioRef = useRef<HTMLDivElement>(null);
-  const expRef = useRef<HTMLDivElement>(null);
-  const eduRef = useRef<HTMLDivElement>(null);
 
   // ── Bio + image entrance ──────────────────────────────────────────────
   useEffect(() => {
@@ -43,86 +25,6 @@ export default function About() {
       { opacity: 0, x: 40 },
       { opacity: 1, x: 0, duration: 0.9, ease: 'power3.out', delay: 0.4 }
     );
-  }, []);
-
-  // ── Bidirectional left↔right scroll animations for experience items ────
-  useEffect(() => {
-    if (loading || !expRef.current) return;
-
-    const items = expRef.current.querySelectorAll('.exp-item');
-    const triggers: ScrollTrigger[] = [];
-
-    // Start items hidden off to the left
-    gsap.set(items, { opacity: 0, x: -60 });
-
-    items.forEach((item) => {
-      const trigger = ScrollTrigger.create({
-        trigger: item,
-        start: 'top 92%',
-        end: 'bottom 8%',
-        // Enter from left
-        onEnter: () => gsap.fromTo(item,
-          { x: -60, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
-        ),
-        // Exit to the left (scroll past top)
-        onLeave: () => gsap.to(item,
-          { x: -60, opacity: 0, duration: 0.45, ease: 'power2.in' }
-        ),
-        // Re-enter from left (scroll back down)
-        onEnterBack: () => gsap.fromTo(item,
-          { x: -60, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
-        ),
-        // Exit to the right (scroll back up past it)
-        onLeaveBack: () => gsap.to(item,
-          { x: 60, opacity: 0, duration: 0.45, ease: 'power2.in' }
-        ),
-      });
-      triggers.push(trigger);
-    });
-
-    return () => { triggers.forEach(t => t.kill()); };
-  }, [loading, experience]);
-
-  // ── Bidirectional scroll animations for education items ───────────────
-  useEffect(() => {
-    if (!eduRef.current) return;
-
-    const items = eduRef.current.querySelectorAll('.edu-item');
-    const triggers: ScrollTrigger[] = [];
-
-    // Start items hidden off to the left
-    gsap.set(items, { opacity: 0, x: -60 });
-
-    items.forEach((item) => {
-      const trigger = ScrollTrigger.create({
-        trigger: item,
-        start: 'top 92%',
-        end: 'bottom 8%',
-        // Enter from left
-        onEnter: () => gsap.fromTo(item,
-          { x: -60, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }
-        ),
-        // Exit to the left (scroll past top)
-        onLeave: () => gsap.to(item,
-          { x: -60, opacity: 0, duration: 0.45, ease: 'power2.in' }
-        ),
-        // Re-enter from left (scroll back down)
-        onEnterBack: () => gsap.fromTo(item,
-          { x: -60, opacity: 0 },
-          { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
-        ),
-        // Exit to the right (scroll back up past it)
-        onLeaveBack: () => gsap.to(item,
-          { x: 60, opacity: 0, duration: 0.45, ease: 'power2.in' }
-        ),
-      });
-      triggers.push(trigger);
-    });
-
-    return () => { triggers.forEach(t => t.kill()); };
   }, []);
 
   return (
@@ -191,6 +93,9 @@ export default function About() {
                 </span>
               ))}
             </div>
+            <p className="font-mono text-xs text-[#666] uppercase tracking-widest mt-8">
+              Hiring rather than commissioning? <Link to="/hire" className="underline">See the CV →</Link>
+            </p>
           </div>
         </div>
 
@@ -218,25 +123,6 @@ export default function About() {
               </div>
             </div>
 
-            {/* Languages */}
-            <div className="border-t-2 border-[#0a0a0a] p-6">
-              <p className="label-mono mb-4">Languages</p>
-              {LANGUAGES.map(({ lang, level, pct }) => (
-                <div key={lang} className="mb-4">
-                  <div className="flex justify-between font-mono text-xs mb-1.5">
-                    <span className="uppercase tracking-wider">{lang}</span>
-                    <span className="text-[#666]">{level}</span>
-                  </div>
-                  <div className="h-1 bg-[#e0e0e0] w-full">
-                    <div
-                      className="h-1 bg-[#0a0a0a]"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
             {/* Hobbies */}
             <div className="border-t-2 border-[#0a0a0a] p-6">
               <p className="label-mono mb-4">Off the Clock</p>
@@ -253,100 +139,6 @@ export default function About() {
           </div>
         </div>
       </div>
-
-      {/* ── Work Experience ───────────────────────────────────────────── */}
-      <section className="site-shell border-b-2 border-[#0a0a0a]">
-        {/* Section header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b-2 border-[#0a0a0a]">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
-            Work Experience ({experience.length})
-          </h2>
-          <span className="font-mono text-xs uppercase tracking-widest text-[#999]">
-            Roles & Positions
-          </span>
-        </div>
-
-        <div ref={expRef}>
-          {loading ? (
-            [0, 1, 2, 4].map((i) => (
-              <div key={i} className="exp-item border-b-2 border-[#0a0a0a] px-6 py-6 md:py-8 animate-pulse">
-                <div className="h-4 bg-[#f0f0f0] w-48 mb-3" />
-                <div className="h-3 bg-[#f0f0f0] w-32 mb-6" />
-                <div className="h-3 bg-[#f0f0f0] w-full" />
-              </div>
-            ))
-          ) : (
-            experience.map((exp, i) => (
-              <div
-                key={exp.id}
-                className={`exp-item flex flex-col md:flex-row border-[#0a0a0a] ${i < experience.length - 1 ? 'border-b-2' : ''}`}
-              >
-                {/* Meta details grouped for mobile row layout */}
-                <div className="flex flex-row md:contents border-b-2 md:border-b-0 border-[#0a0a0a]">
-                  {/* Order number */}
-                  <div className="flex-shrink-0 w-16 flex items-center md:items-start justify-center py-4 md:py-8 border-r-2 border-[#0a0a0a]">
-                    <span className="font-mono text-xs text-[#ccc]">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                  </div>
-
-                  {/* Date column */}
-                  <div className="flex-1 md:flex-none md:w-48 flex items-center md:items-start px-6 py-4 md:py-8 md:border-r-2 border-[#0a0a0a]">
-                    <p className="font-mono text-xs text-[#666] uppercase tracking-widest leading-relaxed">
-                      {exp.date_range}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 px-6 py-6 md:py-8">
-                  <div className="flex flex-wrap items-baseline gap-2 mb-3">
-                    <h3 className="text-xl md:text-2xl font-bold">{exp.job_title}</h3>
-                    <span className="font-mono text-xs text-[#666] uppercase tracking-widest">
-                      @ {exp.company}
-                    </span>
-                  </div>
-                  <p className="text-sm text-[#444] leading-relaxed font-light">
-                    {exp.description}
-                  </p>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
-
-      {/* ── Education ─────────────────────────────────────────────────── */}
-      <section className="site-shell border-b-2 border-[#0a0a0a]">
-        <div className="flex items-center justify-between px-6 py-5 border-b-2 border-[#0a0a0a]">
-          <h2 className="font-mono text-xs uppercase tracking-widest text-[#666]">
-             Education
-          </h2>
-        </div>
-        <div ref={eduRef}>
-          {EDUCATION.map((edu, i) => (
-            <div
-              key={edu.school}
-              className={`edu-item flex flex-col md:flex-row border-[#0a0a0a] ${i < EDUCATION.length - 1 ? 'border-b-2' : ''}`}
-            >
-              <div className="flex flex-row md:contents border-b-2 md:border-b-0 border-[#0a0a0a]">
-                <div className="flex-shrink-0 w-16 flex items-center md:items-start justify-center py-4 md:py-6 border-r-2 border-[#0a0a0a]">
-                  <span className="font-mono text-xs text-[#ccc]">{String(i + 1).padStart(2, '0')}</span>
-                </div>
-                <div className="flex-1 md:flex-none flex items-center md:items-start px-6 py-4 md:py-6 md:w-40 md:border-r-2 border-[#0a0a0a]">
-                  <span className="font-mono text-[10px] uppercase tracking-widest border border-[#ccc] px-2 py-0.5 text-[#666]">
-                    {edu.type}
-                  </span>
-                </div>
-              </div>
-              <div className="flex-1 px-6 py-6">
-                <h4 className="font-bold text-lg">{edu.school}</h4>
-                <p className="font-mono text-xs text-[#666] uppercase tracking-widest mt-1">{edu.field}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </main>
   );
 }

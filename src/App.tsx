@@ -8,6 +8,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Hire from './pages/Hire';
 import Admin from './pages/Admin';
 import CaseStudyFury from './pages/CaseStudyFury';
 
@@ -37,6 +38,7 @@ function Layout() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/hire" element={<Hire />} />
           <Route path="/work/telegram-mini-app-games" element={<CaseStudyFury />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
