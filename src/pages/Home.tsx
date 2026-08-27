@@ -53,19 +53,36 @@ export default function Home() {
           one sentence, one pair of buttons. The stack columns that used to sit
           here moved into the offer tiers — they were the least important
           content on the page occupying two thirds of its most valuable space. */}
-      <section ref={heroRef} className="min-h-[88vh] flex flex-col justify-end">
+      <section ref={heroRef} className="hero-shell flex flex-col justify-end">
         <div className="site-shell w-full px-6 pb-20 md:pb-28">
           <div className="grid lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-14 lg:gap-16 items-end">
           <div>
-          <div
-            ref={metaRef}
-            className="font-mono text-xs uppercase tracking-widest flex flex-wrap items-center gap-x-4 gap-y-1 mb-12 md:mb-16"
-          >
-            <span className="text-[#666]">Product Designer</span>
-            <span aria-hidden className="text-[#ccc]">/</span>
-            <span className="text-[#666]">Yerevan, Armenia</span>
-            <span aria-hidden className="text-[#ccc]">/</span>
-            <span className="text-[#0a0a0a]">{CAPACITY} ◉</span>
+          <div ref={metaRef} className="mb-12 md:mb-16">
+            {/* Below lg there is no second column for the plate, so the
+                portrait rides with the meta line instead — same asset family,
+                dithered at its display size so it stays crisp. */}
+            <div className="flex items-center gap-4 lg:hidden">
+              <img
+                src="/portrait-badge.png"
+                alt="Artagers Grigoryan"
+                width={160}
+                height={160}
+                className="w-20 h-20 border-2 border-[#0a0a0a] bg-[#0a0a0a] shrink-0"
+              />
+              <div className="font-mono text-[11px] uppercase tracking-widest leading-[1.9]">
+                <span className="block font-bold">Artagers Grigoryan</span>
+                <span className="block text-[#666]">Product Designer · Yerevan</span>
+                <span className="block">{CAPACITY} ◉</span>
+              </div>
+            </div>
+
+            <div className="hidden lg:flex font-mono text-xs uppercase tracking-widest flex-wrap items-center gap-x-4 gap-y-1">
+              <span className="text-[#666]">Product Designer</span>
+              <span aria-hidden className="text-[#ccc]">/</span>
+              <span className="text-[#666]">Yerevan, Armenia</span>
+              <span aria-hidden className="text-[#ccc]">/</span>
+              <span className="text-[#0a0a0a]">{CAPACITY} ◉</span>
+            </div>
           </div>
 
           <h1
