@@ -360,19 +360,31 @@ select:focus {
   min-height: clamp(3.5rem, 12vh, 11rem);
 }
 
-.hero-portrait {
+/* The layer fills the stage and carries the scroll parallax. The image keeps
+   its own anchoring transform, which GSAP would otherwise overwrite. */
+.hero-portrait-layer {
   position: absolute;
+  inset: 0;
   z-index: 10;
   pointer-events: none;
   user-select: none;
+}
+
+/* Anchored by its midpoint to the foot of the stage, so exactly half of him
+   runs behind the copy and the buttons at any size. */
+.hero-portrait {
+  position: absolute;
   left: 50%;
-  transform: translateX(-50%);
-  bottom: -4.5rem;
-  height: calc(100% + 4.5rem);
+  bottom: 0;
+  /* 62% of him sits below the stage, behind the copy and the buttons; the
+     remaining 38% is sized to exactly fill the stage, so his head reaches the
+     headline and never covers it. 263% is the height at which those two
+     agree. The vw term caps him on roomy screens so he cannot outgrow the
+     viewport — on short ones the stage term wins and he shrinks instead of
+     climbing into the type. */
+  transform: translate(-50%, 62%);
+  height: min(263%, 155vw);
   width: auto;
-  max-width: 88vw;
-  object-fit: contain;
-  object-position: bottom center;
 }
 
 .hero-lower {
@@ -387,8 +399,10 @@ select:focus {
 .hero-lower::before {
   content: '';
   position: absolute;
-  inset: -5rem -100vw 0;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 34%);
+  /* Runs past the last button too — otherwise he re-emerges in the strip
+     of padding below it. The hero clips the overhang. */
+  inset: -5rem -100vw -50vh;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 27%);
   z-index: -1;
 }
 

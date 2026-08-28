@@ -34,7 +34,7 @@ export default function Home() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
-  const portraitRef = useRef<HTMLImageElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
   const titleWrapRef = useRef<HTMLDivElement>(null);
 
   // ── Hero entrance ────────────────────────────────────────────────────
@@ -90,16 +90,17 @@ export default function Home() {
           </div>
 
           <div className="hero-stage">
-            <img
-              ref={portraitRef}
-              src="/hero-portrait.webp"
-              srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
-              sizes="(max-width: 1023px) 80vw, 46vw"
-              alt="Artagers Grigoryan"
-              width={1200}
-              height={1689}
-              className="hero-portrait"
-            />
+            <div ref={portraitRef} className="hero-portrait-layer">
+              <img
+                src="/hero-portrait.webp"
+                srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
+                sizes="(max-width: 1023px) 80vw, 46vw"
+                alt="Artagers Grigoryan"
+                width={1200}
+                height={1689}
+                className="hero-portrait"
+              />
+            </div>
           </div>
 
           <div ref={subRef} className="hero-lower">
