@@ -245,6 +245,10 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
     window.addEventListener('mousemove', track, { passive: true });
     document.addEventListener('mouseleave', forget);
 
+    // Position at the previous frame. Unchanged coordinates mean the row came
+    // to the cursor, not the cursor to the row.
+    let prev: { x: number; y: number } | null = null;
+
     const frame = () => {
       const p = pointerRef.current;
       const i = p
@@ -253,6 +257,9 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
             return p.y >= r.top && p.y <= r.bottom && p.x >= r.left && p.x <= r.right;
           })
         : -1;
+
+      const moved = !!p && (!prev || prev.x !== p.x || prev.y !== p.y);
+      prev = p;
 
       if (i === -1) {
         if (shownRef.current) {
@@ -267,7 +274,12 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
         setActive(i);
       }
 
-      if (!shownRef.current) {
+      // Only pointing opens the cover. A fast scroll drags every row under a
+      // resting cursor in turn, and without this the whole list flickered past
+      // and left the last one it touched on screen — the bottom project on the
+      // way down, the top one on the way back up. Scrolling can still switch
+      // the cover and close it; it just cannot be what opens it.
+      if (!shownRef.current && moved) {
         shownRef.current = true;
         // The cursor is where it is: materialise there rather than fly in.
         gsap.set(el, { x: p!.x, y: p!.y });
