@@ -77,16 +77,6 @@ export default function Home() {
       <section ref={heroRef} className="hero-shell relative overflow-hidden">
 
         <div className="site-shell relative px-6 flex flex-col flex-1 hero-pad">
-          <img
-            ref={portraitRef}
-            src="/hero-portrait.webp"
-            srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
-            sizes="(max-width: 1023px) 80vw, 46vw"
-            alt="Artagers Grigoryan"
-            width={1200}
-            height={1689}
-            className="hero-portrait"
-          />
           <div ref={metaRef} className="hero-status">
             <span className="hero-status__item">Yerevan, Armenia</span>
             <span className="hero-status__item">{CAPACITY}</span>
@@ -97,6 +87,19 @@ export default function Home() {
               <span className="hero-title__line">From Problem</span>
               <span className="hero-title__line">To Production</span>
             </h1>
+          </div>
+
+          <div className="hero-stage">
+            <img
+              ref={portraitRef}
+              src="/hero-portrait.webp"
+              srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
+              sizes="(max-width: 1023px) 80vw, 46vw"
+              alt="Artagers Grigoryan"
+              width={1200}
+              height={1689}
+              className="hero-portrait"
+            />
           </div>
 
           <div ref={subRef} className="hero-lower">

@@ -349,16 +349,30 @@ select:focus {
 
 /* The cutout: above the type, below the copy. It may cross the headline but
    must never sit on top of words a visitor has to read. */
+/* The stage owns whatever vertical space is left between the headline and the
+   copy. The cutout is sized from it, so it grows and shrinks with the viewport
+   instead of sitting at a guessed fraction of it. */
+.hero-stage {
+  position: relative;
+  flex: 1;
+  /* A floor so a short phone shows a figure rather than a thumbnail — the
+     stage is the first thing flex squeezes, and it squeezes to nothing. */
+  min-height: clamp(3.5rem, 12vh, 11rem);
+}
+
 .hero-portrait {
   position: absolute;
   z-index: 10;
   pointer-events: none;
   user-select: none;
-  height: auto;
   left: 50%;
   transform: translateX(-50%);
-  bottom: clamp(5rem, 12vh, 9rem);
-  width: min(72vw, 31vh, 20rem);
+  bottom: -4.5rem;
+  height: calc(100% + 4.5rem);
+  width: auto;
+  max-width: 88vw;
+  object-fit: contain;
+  object-position: bottom center;
 }
 
 .hero-lower {
@@ -373,8 +387,8 @@ select:focus {
 .hero-lower::before {
   content: '';
   position: absolute;
-  inset: -4rem -100vw 0;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 38%);
+  inset: -5rem -100vw 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, #ffffff 34%);
   z-index: -1;
 }
 
@@ -393,8 +407,44 @@ select:focus {
   margin-top: clamp(1rem, 3vh, 2.25rem);
 }
 
+/* From 640 the layout turns: the cutout leaves the centre for the right edge
+   and the copy takes the left column, so nothing overlaps the reading measure
+   any more. Below 640 he stays centred — there is no room for two columns. */
 @media (min-width: 640px) {
+  .hero-stage {
+    position: static;
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  .hero-portrait {
+    left: auto;
+    right: 1.5rem;
+    top: auto;
+    bottom: 0;
+    transform: none;
+    width: auto;
+    max-width: 52%;
+    height: clamp(18rem, 62vh, 40rem);
+  }
+
+  .hero-lower {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-top: 0;
+    max-width: 58%;
+  }
+
+  /* No overlap once he is out of the centre, so the scrim would only mute
+     the copy for no reason. */
+  .hero-lower::before {
+    display: none;
+  }
+
   .hero-actions {
+    margin-top: auto;
+    padding-top: clamp(1rem, 3vh, 2.25rem);
     align-items: flex-start;
   }
 
@@ -403,38 +453,21 @@ select:focus {
   }
 }
 
-/* Desktop: type runs full-bleed, the cutout stands right of centre, the copy
-   holds the lower left. Nothing overlaps the reading column. */
+/* From 1024 the status line moves to its own column beside the cutout, so the
+   cutout gets inset to leave room for it. */
 @media (min-width: 1024px) {
   .hero-title {
     font-size: min(14.05cqi, 25vh);
   }
 
   .hero-portrait {
-    left: auto;
     right: 17rem;
-    top: auto;
-    bottom: 0;
-    transform: none;
-    width: auto;
+    max-width: none;
     height: clamp(24rem, 70vh, 44rem);
   }
 
   .hero-lower {
     max-width: 46%;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    margin-top: 0;
-  }
-
-  .hero-actions {
-    margin-top: auto;
-    padding-top: clamp(1rem, 3vh, 2.25rem);
-  }
-
-  .hero-lower::before {
-    display: none;
   }
 
   .hero-status {
