@@ -141,6 +141,32 @@ body {
   .work-list * {
     cursor: none;
   }
+
+  /* The offer tiers borrow the same either/or: pointing at one recedes the
+     other. Same 0.35, same easing as .work-row above — deliberately not that
+     class, because its block also hides the cursor, and there is no floating
+     cover down there to stand in for it. */
+  .offer-tier {
+    transition: opacity 0.5s ease;
+  }
+
+  .offer-tiers:hover .offer-tier {
+    opacity: 0.35;
+  }
+
+  .offer-tiers .offer-tier:hover {
+    opacity: 1;
+  }
+
+  /* Decoration only, so it can lead the eye down the list without implying
+     the row is clickable. The per-item delay is set inline. */
+  .offer-arrow {
+    transition: transform 0.5s ease;
+  }
+
+  .offer-tier:hover .offer-arrow {
+    transform: translateX(0.25rem);
+  }
 }
 
 /* Keyboard focus has no cursor for the floating preview to follow —
@@ -264,8 +290,9 @@ select:focus {
 /* ── Section rhythm ───────────────────────────────────────────────────────
    Loosened grid: quiet sections are divided by space rather than rules, so
    their vertical padding has to carry the separation the borders used to.
-   Borders are now an emphasis signal — only the work list and the offer
-   block still use them, which is what makes those two read as important. */
+   Borders are now an emphasis signal — the work list is the only section that
+   still uses them, which is what makes the work read as the page's evidence.
+   The offer block carries its weight in type scale instead. */
 .section-quiet {
   padding-top: clamp(4.5rem, 9vw, 8rem);
   padding-bottom: clamp(4.5rem, 9vw, 8rem);
@@ -375,6 +402,10 @@ select:focus {
 /* Anchored by its midpoint to the foot of the stage, so exactly half of him
    runs behind the copy and the buttons at any size. */
 .hero-portrait {
+  /* 1200 / 1986 — the source image. Every desktop width below is a height
+     envelope multiplied by this, so re-cropping the source means changing one
+     number here rather than nine decimals across three breakpoints. */
+  --portrait-aspect: 0.6042;
   position: absolute;
   left: 50%;
   bottom: 0;
@@ -443,20 +474,16 @@ select:focus {
 
   /* Sized by WIDTH here, not height. A fixed height with `max-width` in play
      squashes the cutout horizontally the moment the height-derived width
-     exceeds the cap — width terms and `height: auto` can never distort him.
-     The values are the old height envelope multiplied by his 1200:1986
-     ratio, so the rendered size is unchanged. */
+     exceeds the cap — width terms and `height: auto` can never distort him. */
   .hero-portrait {
     left: auto;
     right: 1.5rem;
-    top: auto;
-    bottom: 0;
     /* Cropped at the wrists: the watch sits at 76.5% of the source image, so
        shifting down by the remaining 23.5% lands it exactly on the bottom
        edge at every size. The hero clips the overhang. */
     transform: translateY(23.5%);
-    width: min(52%, clamp(10.88rem, 37.46vh, 24.17rem));
-    max-width: none;
+    --portrait-height: clamp(18rem, 62vh, 40rem);
+    width: min(52%, calc(var(--portrait-height) * var(--portrait-aspect)));
     height: auto;
   }
 
@@ -494,7 +521,8 @@ select:focus {
 
   .hero-portrait {
     right: 17rem;
-    width: clamp(14.5rem, 42.29vh, 26.59rem);
+    --portrait-height: clamp(24rem, 70vh, 44rem);
+    width: calc(var(--portrait-height) * var(--portrait-aspect));
   }
 
   .hero-lower {
@@ -513,13 +541,13 @@ select:focus {
   }
 }
 
-/* Desktop: the cutout is sized to the room it actually has. Every term is
-   the 1024 envelope times 1.44, and all three are guarded, because "how much
-   room" is two-dimensional — 60.9vh answers to a short window, 31.2vw to a
+/* Desktop: the cutout is sized to the room it actually has — the 1024
+   envelope times 1.44, guarded on both axes, because "how much room" is
+   two-dimensional. The height envelope answers to a short window, 31.2vw to a
    narrow one, and whichever is scarcer wins. */
 @media (min-width: 1280px) {
   .hero-portrait {
-    width: min(clamp(20.9rem, 60.9vh, 38.3rem), 31.2vw);
+    width: min(calc(var(--portrait-height) * var(--portrait-aspect) * 1.44), 31.2vw);
   }
 }
 
@@ -529,4 +557,25 @@ select:focus {
   .hero-portrait {
     right: 20rem;
   }
+}
+
+/* Floating cover for the work list. The covers are screenshots of real
+   screens, so they keep the proportions they were exported at rather than
+   being cropped into one shared box. Sized by AREA — kw/kh are set per cover
+   in SelectedWork, and default to the 16:10 the box used to be — so a square
+   and a panorama read as the same size instead of the wider one dominating. */
+.work-preview {
+  --preview-base: min(46vw, 200px);
+  width: calc(var(--preview-base) * var(--preview-kw, 1));
+  height: calc(var(--preview-base) * var(--preview-kh, 0.625));
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 1024px) {
+  .work-preview { --preview-base: 360px; }
+}
+
+@media (min-width: 1280px) {
+  .work-preview { --preview-base: 420px; }
 }

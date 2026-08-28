@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ProjectRow from './ProjectRow';
@@ -12,6 +12,19 @@ const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const clamp = (v: number, min: number, max: number) => Math.min(Math.max(v, min), max);
+
+const ROW_SELECTOR = '.project-row-wrapper';
+
+/** Reference shape for cover sizing; the CSS defaults (1 / 0.625) are this. */
+const BASE_RATIO = 1.6;
+
+// One reveal, used by both the pointer and the touch loop. Kept together so
+// the two device paths cannot drift apart the next time it is retuned.
+const showPreview = (el: Element, reduced: boolean) =>
+  gsap.to(el, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.45, ease: 'power3.out' });
+
+const hidePreview = (el: Element, reduced: boolean) =>
+  gsap.to(el, { opacity: 0, scale: 0.92, duration: reduced ? 0 : 0.3, ease: 'power2.out' });
 
 interface SelectedWorkProps {
   projects: CaseStudy[];
@@ -32,15 +45,10 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   const [hoverEnabled, setHoverEnabled] = useState(false);
+  /** Natural width/height of each cover, keyed by project id, once loaded. */
+  const [ratios, setRatios] = useState<Record<string, number>>({});
 
   const quickRef = useRef<{ x?: QuickTo; y?: QuickTo; rot?: QuickTo }>({});
-  const seededRef = useRef(false);
-  const lastXRef = useRef(0);
-  /** Live cursor position; null once the pointer leaves the window. */
-  const pointerRef = useRef<{ x: number; y: number } | null>(null);
-  const shownRef = useRef(false);
-  const activeRef = useRef(0);
-  const idleRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // ── Pointer capability ────────────────────────────────────────────────
   useEffect(() => {
@@ -55,7 +63,7 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
   useEffect(() => {
     if (loading || !listRef.current) return;
 
-    const rows = gsap.utils.toArray<HTMLElement>('.project-row-wrapper', listRef.current);
+    const rows = gsap.utils.toArray<HTMLElement>(ROW_SELECTOR, listRef.current);
     if (!rows.length) return;
 
     if (prefersReducedMotion()) {
@@ -91,8 +99,6 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
 
     return () => {
       quickRef.current = {};
-      seededRef.current = false;
-      clearTimeout(idleRef.current);
       gsap.killTweensOf(el);
     };
   }, [hoverEnabled, projects]);
@@ -111,17 +117,29 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
 
     const el = previewRef.current;
     const list = listRef.current;
-    const rows = gsap.utils.toArray<HTMLElement>('.project-row-wrapper', list);
+    const rows = gsap.utils.toArray<HTMLElement>(ROW_SELECTOR, list);
     if (!el || !rows.length) return;
 
     const reduced = prefersReducedMotion();
     const rowEls = rows.map((row) => row.querySelector('.work-row'));
     gsap.set(rowEls, { opacity: 0.35 });
 
-    // Anchored to the row's top-right rather than its centre.
+    // Anchored to the row's top-right rather than its centre. The box is as
+    // wide as the cover currently in it, so the anchor moves — but observing
+    // that width is far cheaper than measuring it every frame, which would
+    // force a layout flush inside the ticker on each tick.
     const RIGHT_GAP = 16;
-    let rightX = window.innerWidth - el.offsetWidth / 2 - RIGHT_GAP;
-    let lastWidth = window.innerWidth;
+    let elWidth = el.offsetWidth;
+    let appliedX = NaN;
+    const anchorRight = () => {
+      const x = window.innerWidth - elWidth / 2 - RIGHT_GAP;
+      if (x !== appliedX) {
+        appliedX = x;
+        gsap.set(el, { x });
+      }
+    };
+    const ro = new ResizeObserver(() => { elWidth = el.offsetWidth; });
+    ro.observe(el);
 
     let current = -1;
     let visible = false;
@@ -129,12 +147,7 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
     // Sampled on resize only: iOS moves innerHeight every frame while the URL
     // bar collapses, which would jiggle the anchor line.
     let vh = window.innerHeight;
-    const onResize = () => {
-      vh = window.innerHeight;
-      lastWidth = window.innerWidth;
-      rightX = lastWidth - el.offsetWidth / 2 - RIGHT_GAP;
-      gsap.set(el, { x: rightX });
-    };
+    const onResize = () => { vh = window.innerHeight; };
     window.addEventListener('resize', onResize);
 
     /** Reading line: the row crossing this is the one being looked at. */
@@ -147,13 +160,14 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
      * equidistant swap every frame and the cover strobes between them.
      */
     const SWITCH_MARGIN = 40;
+    const rects: DOMRect[] = [];
     const nearestRow = (a: number) => {
       let best = current;
       let bestDist = Infinity;
       let currentDist = Infinity;
 
       rows.forEach((row, i) => {
-        const r = row.getBoundingClientRect();
+        const r = (rects[i] = row.getBoundingClientRect());
         const d = Math.abs(r.top + r.height / 2 - a);
         if (i === current) currentDist = d;
         if (d < bestDist) { bestDist = d; best = i; }
@@ -184,7 +198,7 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
       if (!inView) {
         if (visible) {
           visible = false;
-          gsap.to(el, { opacity: 0, scale: 0.92, duration: reduced ? 0 : 0.3, ease: 'power2.out' });
+          hidePreview(el, reduced);
         }
         return;
       }
@@ -193,14 +207,16 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
       if (i < 0) return;
       setCurrent(i);
 
-      const y = targetY(rows[i].getBoundingClientRect());
+      const y = targetY(rects[i]);
 
       // Seed on the way in so it materialises in place instead of flying up the page.
       if (!visible) {
         visible = true;
-        gsap.set(el, { x: rightX, y, rotation: 0 });
-        gsap.to(el, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.45, ease: 'power3.out' });
+        gsap.set(el, { y, rotation: 0 });
+        showPreview(el, reduced);
       }
+
+      anchorRight();
 
       // No tilt on touch: scroll deltas are too noisy for it to read as anything
       // but vibration. The cover just glides.
@@ -213,8 +229,10 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
 
     return () => {
       window.removeEventListener('resize', onResize);
+      ro.disconnect();
       gsap.ticker.remove(frame);
       gsap.killTweensOf(el);
+      gsap.set(el, { opacity: 0, scale: 0.92 });
       gsap.set(rowEls, { opacity: 1 });
     };
   }, [loading, hoverEnabled, projects]);
@@ -226,51 +244,64 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
   // leaving a final, unmatched mouseenter behind. That is what stranded the
   // cover: visible, frozen, floating over whatever section had scrolled in.
   //
-  // So visibility and the active row are owned here, not by the handlers.
-  // Hit-testing the live cursor point each frame is correct whatever the
-  // events do, at any scroll speed, in either direction.
+  // So the cover has one owner. Visibility, the active row, the follow and the
+  // tilt are all resolved here from the live cursor point, which is correct
+  // whatever the events do, at any scroll speed, in either direction.
   useEffect(() => {
     if (loading || !hoverEnabled || !listRef.current) return;
 
     const el = previewRef.current;
-    const rows = gsap.utils.toArray<HTMLElement>('.project-row-wrapper', listRef.current);
+    const list = listRef.current;
+    const rows = gsap.utils.toArray<HTMLElement>(ROW_SELECTOR, list);
     if (!el || !rows.length) return;
 
     const reduced = prefersReducedMotion();
 
-    // Tracked on the window, not the list: the frame needs to know the cursor
-    // has moved away just as much as it needs to know it is still here.
-    const track = (e: MouseEvent) => { pointerRef.current = { x: e.clientX, y: e.clientY }; };
-    const forget = () => { pointerRef.current = null; };
-    window.addEventListener('mousemove', track, { passive: true });
-    document.addEventListener('mouseleave', forget);
-
+    let pointer: { x: number; y: number } | null = null;
     // Position at the previous frame. Unchanged coordinates mean the row came
     // to the cursor, not the cursor to the row.
     let prev: { x: number; y: number } | null = null;
+    let shown = false;
+    let current = -1;
+
+    // Tracked on the window, not the list: the frame needs to know the cursor
+    // has moved away just as much as it needs to know it is still here.
+    const track = (e: MouseEvent) => { pointer = { x: e.clientX, y: e.clientY }; };
+    const forget = () => { pointer = null; };
+    window.addEventListener('mousemove', track, { passive: true });
+    document.addEventListener('mouseleave', forget);
 
     const frame = () => {
-      const p = pointerRef.current;
-      const i = p
-        ? rows.findIndex((row) => {
-            const r = row.getBoundingClientRect();
-            return p.y >= r.top && p.y <= r.bottom && p.x >= r.left && p.x <= r.right;
-          })
-        : -1;
-
+      const p = pointer;
+      const dx = p && prev ? p.x - prev.x : 0;
       const moved = !!p && (!prev || prev.x !== p.x || prev.y !== p.y);
       prev = p;
 
+      // The list's own rect first. This runs every frame, and the cursor is
+      // usually nowhere near the list — one layout read then answers it,
+      // instead of one per row. Rows span the full width, so inside the list
+      // only their vertical extent is left to test.
+      let i = -1;
+      if (p) {
+        const b = list.getBoundingClientRect();
+        if (p.x >= b.left && p.x <= b.right && p.y >= b.top && p.y <= b.bottom) {
+          i = rows.findIndex((row) => {
+            const r = row.getBoundingClientRect();
+            return p.y >= r.top && p.y <= r.bottom;
+          });
+        }
+      }
+
       if (i === -1) {
-        if (shownRef.current) {
-          shownRef.current = false;
-          gsap.to(el, { opacity: 0, scale: 0.92, duration: reduced ? 0 : 0.3, ease: 'power2.out' });
+        if (shown) {
+          shown = false;
+          hidePreview(el, reduced);
         }
         return;
       }
 
-      if (i !== activeRef.current) {
-        activeRef.current = i;
+      if (i !== current) {
+        current = i;
         setActive(i);
       }
 
@@ -279,12 +310,24 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
       // and left the last one it touched on screen — the bottom project on the
       // way down, the top one on the way back up. Scrolling can still switch
       // the cover and close it; it just cannot be what opens it.
-      if (!shownRef.current && moved) {
-        shownRef.current = true;
+      if (!shown) {
+        if (!moved) return;
+        shown = true;
         // The cursor is where it is: materialise there rather than fly in.
         gsap.set(el, { x: p!.x, y: p!.y });
-        gsap.to(el, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.45, ease: 'power3.out' });
+        showPreview(el, reduced);
       }
+
+      const { x, y, rot } = quickRef.current;
+      if (x && y) {
+        x(p!.x);
+        y(p!.y);
+      } else {
+        gsap.set(el, { x: p!.x, y: p!.y });
+      }
+      // Tilt with horizontal velocity, level again the moment it stops. The
+      // frame already knows both, so this needs no idle timer of its own.
+      if (rot) rot(moved ? clamp(dx * 0.35, -10, 10) : 0);
     };
 
     gsap.ticker.add(frame);
@@ -294,41 +337,16 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
       window.removeEventListener('mousemove', track);
       document.removeEventListener('mouseleave', forget);
       gsap.ticker.remove(frame);
-      shownRef.current = false;
+      gsap.set(el, { opacity: 0, scale: 0.92 });
     };
   }, [loading, hoverEnabled, projects]);
 
-  // ── Pointer handlers ──────────────────────────────────────────────────
-  const handleMove = (e: React.MouseEvent) => {
-    const el = previewRef.current;
-    if (!el || !hoverEnabled) return;
-
-    const { x, y, rot } = quickRef.current;
-
-    // First move after entering: materialise under the cursor, don't fly in.
-    if (!seededRef.current || !x || !y) {
-      gsap.set(el, { x: e.clientX, y: e.clientY });
-      seededRef.current = true;
-      lastXRef.current = e.clientX;
-      return;
-    }
-
-    x(e.clientX);
-    y(e.clientY);
-
-    if (rot) {
-      rot(clamp((e.clientX - lastXRef.current) * 0.35, -10, 10));
-      // Settle back to level once the pointer stops moving.
-      clearTimeout(idleRef.current);
-      idleRef.current = setTimeout(() => rot(0), 90);
-    }
-    lastXRef.current = e.clientX;
-  };
-
-  const handleLeave = () => {
-    seededRef.current = false;
-    clearTimeout(idleRef.current);
-  };
+  // Each cover keeps the shape it was exported at. Sizing is by AREA, not by
+  // width: kw/kh give every cover the same area as the 16:10 box they used to
+  // share, so a square and a panorama read as the same size instead of the
+  // wider one dominating. Unloaded covers fall back to the CSS 16:10 default.
+  const ratio = ratios[projects[active]?.id];
+  const kw = ratio ? Math.sqrt(ratio / BASE_RATIO) : 0;
 
   // ── Loading skeleton ──────────────────────────────────────────────────
   if (loading) {
@@ -345,12 +363,7 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
 
   return (
     <>
-      <div
-        ref={listRef}
-        className="work-list"
-        onMouseMove={hoverEnabled ? handleMove : undefined}
-        onMouseLeave={hoverEnabled ? handleLeave : undefined}
-      >
+      <div ref={listRef} className="work-list">
         {projects.map((project, i) => (
           <div key={project.id} className="project-row-wrapper border-b-2 border-[#0a0a0a]">
             <ProjectRow project={project} index={i} />
@@ -364,8 +377,13 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
         <div
           ref={previewRef}
           aria-hidden
-          className="fixed left-0 top-0 z-40 pointer-events-none w-[46vw] max-w-[200px] lg:w-[360px] lg:max-w-none xl:w-[420px] border-2 border-[#0a0a0a] bg-white overflow-hidden opacity-0 will-change-transform"
-          style={{ aspectRatio: '16 / 10', backfaceVisibility: 'hidden' }}
+          className="work-preview fixed left-0 top-0 z-40 pointer-events-none border-2 border-[#0a0a0a] bg-white overflow-hidden opacity-0 will-change-transform"
+          style={
+            {
+              backfaceVisibility: 'hidden',
+              ...(ratio && { '--preview-kw': kw, '--preview-kh': kw / ratio }),
+            } as CSSProperties
+          }
         >
           {projects.map((project, i) => (
             <img
@@ -374,6 +392,11 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               style={{ opacity: i === active ? 1 : 0, transition: 'opacity 0.25s ease' }}
+              onLoad={(e) => {
+                const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+                if (!w || !h) return;
+                setRatios((prev) => (prev[project.id] ? prev : { ...prev, [project.id]: w / h }));
+              }}
             />
           ))}
         </div>

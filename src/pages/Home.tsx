@@ -117,7 +117,7 @@ export default function Home() {
                 className="btn-brutal-primary text-center"
                 onClick={() => trackEvent('cta_start_project', { location: 'hero' })}
               >
-                Start project →
+                Start project
               </Link>
               <a
                 href="#work"

@@ -27,46 +27,44 @@ export default function ProjectRow({ project, index }: ProjectRowProps) {
   };
 
   const content = (
-    <>
-      <div className="project-row-text flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
-        <span className="font-mono text-xs tracking-widest text-[#999] lg:w-12 shrink-0">
-          {String(index + 1).padStart(2, '0')}
-        </span>
+    <div className="project-row-text flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+      <span className="font-mono text-xs tracking-widest text-[#999] lg:w-12 shrink-0">
+        {String(index + 1).padStart(2, '0')}
+      </span>
 
-        <h3 className="text-3xl lg:text-4xl xl:text-5xl font-bold uppercase leading-none tracking-tight transition-transform duration-500 ease-out lg:group-hover:translate-x-4">
-          {project.title}
-        </h3>
+      <h3 className="text-3xl lg:text-4xl xl:text-5xl font-bold uppercase leading-none tracking-tight transition-transform duration-500 ease-out lg:group-hover:translate-x-4">
+        {project.title}
+      </h3>
 
-        {/* Description only reads on mobile — desktop rows stay one line */}
-        <p className="lg:hidden text-sm text-[#444] leading-relaxed font-light">
-          {project.description}
+      {/* Description only reads on mobile — desktop rows stay one line */}
+      <p className="lg:hidden text-sm text-[#444] leading-relaxed font-light">
+        {project.description}
+      </p>
+
+      {project.outcome && (
+        <p className="lg:max-w-sm text-sm text-[#444] leading-snug font-light lg:order-last lg:w-full">
+          {project.outcome}
         </p>
+      )}
 
-        {project.outcome && (
-          <p className="lg:max-w-sm text-sm text-[#444] leading-snug font-light lg:order-last lg:w-full">
-            {project.outcome}
-          </p>
-        )}
-
-        <div className="flex items-center gap-4 lg:ml-auto lg:gap-8">
-          <div className="flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="font-mono text-[10px] uppercase tracking-widest border border-current px-2 py-0.5"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-          <span
-            className="font-mono text-[11px] uppercase tracking-widest shrink-0 ml-auto lg:ml-0 whitespace-nowrap transition-transform duration-500 ease-out lg:group-hover:translate-x-2"
-          >
-            {project.link_label || 'View project →'}
-          </span>
+      <div className="flex items-center gap-4 lg:ml-auto lg:gap-8">
+        <div className="flex flex-wrap gap-2">
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="font-mono text-[10px] uppercase tracking-widest border border-current px-2 py-0.5"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
+        <span
+          className="font-mono text-[11px] uppercase tracking-widest shrink-0 ml-auto lg:ml-0 whitespace-nowrap transition-transform duration-500 ease-out lg:group-hover:translate-x-2"
+        >
+          {project.link_label || 'View project →'}
+        </span>
       </div>
-    </>
+    </div>
   );
 
   return isInternal ? (
