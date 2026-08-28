@@ -5,19 +5,17 @@ import { trackEvent } from '../lib/analytics';
 interface ProjectRowProps {
   project: CaseStudy;
   index: number;
-  /** Pointer devices activate on hover; touch devices activate on scroll. */
-  hoverEnabled: boolean;
-  onActivate: (index: number) => void;
 }
 
 /**
  * ProjectRow — one line of the Selected Work list.
  *
  * Text only (index / title / tags / arrow) — the cover is drawn by the floating
- * preview in SelectedWork, which follows the cursor on pointer devices and the
- * active row on touch devices.
+ * preview in SelectedWork, which resolves the active row itself: by hit-testing
+ * the cursor on pointer devices, by scroll position on touch ones. Rows report
+ * no hover state of their own; that was the source of a stranded cover.
  */
-export default function ProjectRow({ project, index, hoverEnabled, onActivate }: ProjectRowProps) {
+export default function ProjectRow({ project, index }: ProjectRowProps) {
   // Links starting with "/" are internal case pages; "http…" opens externally; "#" is inert.
   const isInternal = project.link.startsWith('/');
   const isInert = project.link === '#';
@@ -71,10 +69,8 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
     </>
   );
 
-  const hoverProps = hoverEnabled ? { onMouseEnter: () => onActivate(index) } : {};
-
   return isInternal ? (
-    <Link to={project.link} className={rowClass} onClick={handleVerifyClick} {...hoverProps}>
+    <Link to={project.link} className={rowClass} onClick={handleVerifyClick}>
       {content}
     </Link>
   ) : (
@@ -84,7 +80,6 @@ export default function ProjectRow({ project, index, hoverEnabled, onActivate }:
       rel="noopener noreferrer"
       className={rowClass}
       onClick={(e) => { if (isInert) { e.preventDefault(); return; } handleVerifyClick(); }}
-      {...hoverProps}
     >
       {content}
     </a>

@@ -36,6 +36,10 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
   const quickRef = useRef<{ x?: QuickTo; y?: QuickTo; rot?: QuickTo }>({});
   const seededRef = useRef(false);
   const lastXRef = useRef(0);
+  /** Live cursor position; null once the pointer leaves the window. */
+  const pointerRef = useRef<{ x: number; y: number } | null>(null);
+  const shownRef = useRef(false);
+  const activeRef = useRef(0);
   const idleRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // ── Pointer capability ────────────────────────────────────────────────
@@ -215,6 +219,73 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
     };
   }, [loading, hoverEnabled, projects]);
 
+  // ── Pointer: the row under the cursor, resolved every frame ───────────
+  // mouseenter/mouseleave cannot answer this on their own. Scrolling with the
+  // mouse held still slides rows past a stationary cursor, and Chrome fires
+  // those enter/leave pairs unevenly — the list can scroll clean out of view
+  // leaving a final, unmatched mouseenter behind. That is what stranded the
+  // cover: visible, frozen, floating over whatever section had scrolled in.
+  //
+  // So visibility and the active row are owned here, not by the handlers.
+  // Hit-testing the live cursor point each frame is correct whatever the
+  // events do, at any scroll speed, in either direction.
+  useEffect(() => {
+    if (loading || !hoverEnabled || !listRef.current) return;
+
+    const el = previewRef.current;
+    const rows = gsap.utils.toArray<HTMLElement>('.project-row-wrapper', listRef.current);
+    if (!el || !rows.length) return;
+
+    const reduced = prefersReducedMotion();
+
+    // Tracked on the window, not the list: the frame needs to know the cursor
+    // has moved away just as much as it needs to know it is still here.
+    const track = (e: MouseEvent) => { pointerRef.current = { x: e.clientX, y: e.clientY }; };
+    const forget = () => { pointerRef.current = null; };
+    window.addEventListener('mousemove', track, { passive: true });
+    document.addEventListener('mouseleave', forget);
+
+    const frame = () => {
+      const p = pointerRef.current;
+      const i = p
+        ? rows.findIndex((row) => {
+            const r = row.getBoundingClientRect();
+            return p.y >= r.top && p.y <= r.bottom && p.x >= r.left && p.x <= r.right;
+          })
+        : -1;
+
+      if (i === -1) {
+        if (shownRef.current) {
+          shownRef.current = false;
+          gsap.to(el, { opacity: 0, scale: 0.92, duration: reduced ? 0 : 0.3, ease: 'power2.out' });
+        }
+        return;
+      }
+
+      if (i !== activeRef.current) {
+        activeRef.current = i;
+        setActive(i);
+      }
+
+      if (!shownRef.current) {
+        shownRef.current = true;
+        // The cursor is where it is: materialise there rather than fly in.
+        gsap.set(el, { x: p!.x, y: p!.y });
+        gsap.to(el, { opacity: 1, scale: 1, duration: reduced ? 0 : 0.45, ease: 'power3.out' });
+      }
+    };
+
+    gsap.ticker.add(frame);
+    frame();
+
+    return () => {
+      window.removeEventListener('mousemove', track);
+      document.removeEventListener('mouseleave', forget);
+      gsap.ticker.remove(frame);
+      shownRef.current = false;
+    };
+  }, [loading, hoverEnabled, projects]);
+
   // ── Pointer handlers ──────────────────────────────────────────────────
   const handleMove = (e: React.MouseEvent) => {
     const el = previewRef.current;
@@ -242,29 +313,9 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
     lastXRef.current = e.clientX;
   };
 
-  const handleActivate = (index: number) => {
-    setActive(index);
-    const el = previewRef.current;
-    if (!el) return;
-    gsap.to(el, {
-      opacity: 1,
-      scale: 1,
-      duration: prefersReducedMotion() ? 0 : 0.45,
-      ease: 'power3.out',
-    });
-  };
-
   const handleLeave = () => {
-    const el = previewRef.current;
-    if (!el) return;
     seededRef.current = false;
     clearTimeout(idleRef.current);
-    gsap.to(el, {
-      opacity: 0,
-      scale: 0.92,
-      duration: prefersReducedMotion() ? 0 : 0.3,
-      ease: 'power2.out',
-    });
   };
 
   // ── Loading skeleton ──────────────────────────────────────────────────
@@ -290,12 +341,7 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
       >
         {projects.map((project, i) => (
           <div key={project.id} className="project-row-wrapper border-b-2 border-[#0a0a0a]">
-            <ProjectRow
-              project={project}
-              index={i}
-              hoverEnabled={hoverEnabled}
-              onActivate={handleActivate}
-            />
+            <ProjectRow project={project} index={i} />
           </div>
         ))}
       </div>
