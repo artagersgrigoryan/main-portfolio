@@ -75,18 +75,18 @@ export default function Home() {
           the two layers drift in opposition — the portrait lags, the headline
           leads — which separates them instead of colliding. */}
       <section ref={heroRef} className="hero-shell relative overflow-hidden">
-        <img
-          ref={portraitRef}
-          src="/hero-portrait.webp"
-          srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
-          sizes="(max-width: 1023px) 80vw, 46vw"
-          alt="Artagers Grigoryan"
-          width={1200}
-          height={1689}
-          className="hero-portrait"
-        />
 
         <div className="site-shell relative px-6 flex flex-col flex-1 hero-pad">
+          <img
+            ref={portraitRef}
+            src="/hero-portrait.webp"
+            srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
+            sizes="(max-width: 1023px) 80vw, 46vw"
+            alt="Artagers Grigoryan"
+            width={1200}
+            height={1689}
+            className="hero-portrait"
+          />
           <div ref={metaRef} className="hero-status">
             <span className="hero-status__item">Yerevan, Armenia</span>
             <span className="hero-status__item">{CAPACITY}</span>
@@ -94,9 +94,8 @@ export default function Home() {
 
           <div ref={titleWrapRef} className="hero-title-wrap">
             <h1 ref={headingRef} className="hero-title">
-              From Problem
-              <br />
-              To Production
+              <span className="hero-title__line">From Problem</span>
+              <span className="hero-title__line">To Production</span>
             </h1>
           </div>
 

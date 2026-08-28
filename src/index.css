@@ -329,11 +329,18 @@ select:focus {
   margin-top: clamp(1rem, 3.5vh, 3rem);
 }
 
+.hero-title__line {
+  display: block;
+  white-space: nowrap;
+}
+
 .hero-title {
-  /* 13.1cqi makes the longer line ("TO PRODUCTION") span the full measure.
-     The vh term keeps a short viewport from letting the type crowd out the
-     CTAs. */
-  font-size: min(13.1cqi, 14vh);
+  /* Both lines render to an identical width in this face — measured ratio
+     1.0000 — so a single size sets them flush on both edges with no
+     per-line tuning and no SVG. 14.05cqi is the size at which that width
+     equals the measure. The vh term keeps a short viewport from letting the
+     type crowd the CTAs off the fold. */
+  font-size: min(14.05cqi, 14vh);
   font-weight: 700;
   line-height: 0.88;
   letter-spacing: -0.035em;
@@ -400,12 +407,12 @@ select:focus {
    holds the lower left. Nothing overlaps the reading column. */
 @media (min-width: 1024px) {
   .hero-title {
-    font-size: min(13.1cqi, 23vh);
+    font-size: min(14.05cqi, 25vh);
   }
 
   .hero-portrait {
     left: auto;
-    right: 15rem;
+    right: 17rem;
     top: auto;
     bottom: 0;
     transform: none;
