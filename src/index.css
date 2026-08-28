@@ -364,7 +364,9 @@ select:focus {
    its own anchoring transform, which GSAP would otherwise overwrite. */
 .hero-portrait-layer {
   position: absolute;
-  inset: 0;
+  /* Bleeds past the text gutter: the cutout is wider than the reading measure
+     at this size, and a layer that stopped at the padding would crop him. */
+  inset: 0 -1.5rem;
   z-index: 10;
   pointer-events: none;
   user-select: none;
@@ -385,6 +387,10 @@ select:focus {
   transform: translate(-50%, 62%);
   height: min(263%, 155vw);
   width: auto;
+  /* Preflight sets `img { max-width: 100% }`, which with a fixed height
+     compresses him horizontally instead of scaling him down. The 155vw cap
+     above already keeps his width under 94vw, so nothing needs clamping. */
+  max-width: none;
 }
 
 .hero-lower {
@@ -425,21 +431,30 @@ select:focus {
    and the copy takes the left column, so nothing overlaps the reading measure
    any more. Below 640 he stays centred — there is no room for two columns. */
 @media (min-width: 640px) {
+  .hero-portrait-layer {
+    inset: 0;
+  }
+
   .hero-stage {
     position: static;
     flex: 0 0 auto;
     min-height: 0;
   }
 
+  /* Sized by WIDTH here, not height. A fixed height with `max-width` in play
+     squashes the cutout horizontally the moment the height-derived width
+     exceeds the cap — width terms and `height: auto` can never distort him.
+     The values are the old height envelope multiplied by his 1200:1986
+     ratio, so the rendered size is unchanged. */
   .hero-portrait {
     left: auto;
     right: 1.5rem;
     top: auto;
     bottom: 0;
     transform: none;
-    width: auto;
-    max-width: 52%;
-    height: clamp(18rem, 62vh, 40rem);
+    width: min(52%, clamp(10.88rem, 37.46vh, 24.17rem));
+    max-width: none;
+    height: auto;
   }
 
   .hero-lower {
@@ -476,8 +491,7 @@ select:focus {
 
   .hero-portrait {
     right: 17rem;
-    max-width: none;
-    height: clamp(24rem, 70vh, 44rem);
+    width: clamp(14.5rem, 42.29vh, 26.59rem);
   }
 
   .hero-lower {

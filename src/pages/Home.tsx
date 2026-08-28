@@ -97,7 +97,7 @@ export default function Home() {
                 sizes="(max-width: 1023px) 80vw, 46vw"
                 alt="Artagers Grigoryan"
                 width={1200}
-                height={1689}
+                height={1986}
                 className="hero-portrait"
               />
             </div>
