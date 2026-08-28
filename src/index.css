@@ -509,3 +509,16 @@ select:focus {
     padding-top: 0;
   }
 }
+
+/* Large desktops: the cutout has room it was not using. He grows ~20% and
+   steps further off the right edge, which also opens the gap to the status
+   column. Both terms are guarded, because "large" is two-dimensional:
+   50.75vh keeps a short 1440x900 laptop from having him climb the headline,
+   and 26vw keeps a narrow-but-tall window from doing the same. The full
+   +20% only lands where both axes are actually large. */
+@media (min-width: 1440px) {
+  .hero-portrait {
+    right: 20rem;
+    width: min(clamp(17.4rem, 50.75vh, 31.9rem), 26vw);
+  }
+}
