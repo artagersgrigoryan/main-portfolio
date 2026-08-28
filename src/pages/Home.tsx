@@ -34,7 +34,8 @@ export default function Home() {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
-  const plateRef = useRef<HTMLElement>(null);
+  const portraitRef = useRef<HTMLImageElement>(null);
+  const titleWrapRef = useRef<HTMLDivElement>(null);
 
   // ── Hero entrance ────────────────────────────────────────────────────
   useEffect(() => {
@@ -42,75 +43,82 @@ export default function Home() {
     tl.fromTo(headingRef.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
       .fromTo(subRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.5')
       .fromTo(metaRef.current, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, '-=0.3')
-      .fromTo(plateRef.current, { opacity: 0 }, { opacity: 1, duration: 0.6 }, '-=0.4');
+      .fromTo(portraitRef.current, { opacity: 0 }, { opacity: 1, duration: 0.7 }, '-=0.5');
     return () => { tl.kill(); };
+  }, []);
+
+  // ── Opposed parallax ─────────────────────────────────────────────────
+  // Portrait lags the page, headline leads it, so the two planes separate as
+  // the hero scrolls away. Skipped entirely under reduced motion.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const ctx = gsap.context(() => {
+      const scrollTrigger = {
+        trigger: heroRef.current,
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.5,
+      };
+      gsap.to(portraitRef.current, { yPercent: 9, ease: 'none', scrollTrigger });
+      gsap.to(titleWrapRef.current, { yPercent: -26, ease: 'none', scrollTrigger });
+    });
+
+    return () => ctx.revert();
   }, []);
 
   return (
     <main className="pt-14">
       {/* ── Hero ─────────────────────────────────────────────────────────
-          Quiet section. Four elements and nothing else: capacity, headline,
-          one sentence, one pair of buttons. The stack columns that used to sit
-          here moved into the offer tiers — they were the least important
-          content on the page occupying two thirds of its most valuable space. */}
-      <section ref={heroRef} className="hero-shell flex flex-col justify-end">
-        <div className="site-shell w-full px-6 pb-20 md:pb-28">
-          <div className="grid lg:grid-cols-[1fr_340px] xl:grid-cols-[1fr_380px] gap-14 lg:gap-16 items-end">
-          <div>
-          <div ref={metaRef} className="mb-12 md:mb-16">
-            {/* Below lg there is no second column for the plate, so the
-                portrait rides with the meta line instead — same asset family,
-                dithered at its display size so it stays crisp. */}
-            <div className="flex items-center gap-4 lg:hidden">
-              <img
-                src="/portrait-badge.png"
-                alt="Artagers Grigoryan"
-                width={160}
-                height={160}
-                className="w-20 h-20 border-2 border-[#0a0a0a] bg-[#0a0a0a] shrink-0"
-              />
-              <div className="font-mono text-[11px] uppercase tracking-widest leading-[1.9]">
-                <span className="block font-bold">Artagers Grigoryan</span>
-                <span className="block text-[#666]">Product Designer · Yerevan</span>
-                <span className="block">{CAPACITY} ◉</span>
-              </div>
-            </div>
+          The cutout stands in front of the headline rather than beside it, so
+          the type runs full-bleed instead of making room for a box. On scroll
+          the two layers drift in opposition — the portrait lags, the headline
+          leads — which separates them instead of colliding. */}
+      <section ref={heroRef} className="hero-shell relative overflow-hidden">
+        <img
+          ref={portraitRef}
+          src="/hero-portrait.webp"
+          srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
+          sizes="(max-width: 1023px) 80vw, 46vw"
+          alt="Artagers Grigoryan"
+          width={1200}
+          height={1689}
+          className="hero-portrait"
+        />
 
-            <div className="hidden lg:flex font-mono text-xs uppercase tracking-widest flex-wrap items-center gap-x-4 gap-y-1">
-              <span className="text-[#666]">Product Designer</span>
-              <span aria-hidden className="text-[#ccc]">/</span>
-              <span className="text-[#666]">Yerevan, Armenia</span>
-              <span aria-hidden className="text-[#ccc]">/</span>
-              <span className="text-[#0a0a0a]">{CAPACITY} ◉</span>
-            </div>
+        <div className="site-shell relative px-6 flex flex-col flex-1 hero-pad">
+          <div ref={metaRef} className="hero-status">
+            <span className="hero-status__item">Yerevan, Armenia</span>
+            <span className="hero-status__item">{CAPACITY}</span>
           </div>
 
-          <h1
-            ref={headingRef}
-            className="text-[clamp(3rem,10vw,9rem)] lg:text-[clamp(3rem,6.6vw,6.5rem)] font-bold leading-[0.9] tracking-[-0.03em] uppercase"
-          >
-            From Problem
-            <br />
-            To <span className="inline-block border-b-[6px] border-[#0a0a0a]">Production</span>
-          </h1>
+          <div ref={titleWrapRef} className="hero-title-wrap">
+            <h1 ref={headingRef} className="hero-title">
+              From Problem
+              <br />
+              To Production
+            </h1>
+          </div>
 
-          <div ref={subRef} className="mt-10 md:mt-14 max-w-2xl">
-            <p className="text-lg md:text-xl text-[#444] leading-relaxed font-light">
-              I'm Artagers Grigoryan — product designer for iGaming, Web3 and
-              data-heavy platforms. I design the product, and when you need it
-              live rather than just drawn, I build and ship the front-end myself.
+          <div ref={subRef} className="hero-lower">
+            <p className="hero-lede">
+              <strong className="font-bold text-[#0a0a0a]">Artagers Grigoryan</strong> — product
+              designer for iGaming, Web3 and complex digital environments. I design the product,
+              and when you need it live rather than just drawn, I build and ship the front-end
+              myself.
             </p>
-            <div className="flex flex-wrap items-center gap-4 mt-10">
+
+            <div className="hero-actions">
               <Link
                 to="/contact"
-                className="btn-brutal-primary"
+                className="btn-brutal-primary text-center"
                 onClick={() => trackEvent('cta_start_project', { location: 'hero' })}
               >
-                Start a project →
+                Start project →
               </Link>
               <a
                 href="#work"
-                className="btn-brutal font-mono text-sm"
+                className="btn-brutal font-mono text-sm text-center"
                 onClick={(e) => {
                   const target = document.getElementById('work');
                   if (lenis && target) {
@@ -122,36 +130,6 @@ export default function Home() {
                 See the work
               </a>
             </div>
-          </div>
-          </div>
-
-          {/* Portrait plate. Sits in the column that was already empty, so it
-              costs the hero no hierarchy. Default state is a 1-bit dither —
-              a printed plate — which resolves into the photograph on hover.
-              Touch devices never hover, so the printed state is the one most
-              visitors see; it has to work on its own. */}
-          <figure ref={plateRef} className="portrait-plate hidden lg:block m-0">
-            <div className="relative border-2 border-[#0a0a0a] bg-[#0a0a0a] overflow-hidden">
-              <img
-                src="/portrait-print.png"
-                alt="Artagers Grigoryan"
-                width={900}
-                height={1125}
-                className="block w-full"
-              />
-              <img
-                src="/portrait-photo.jpg"
-                alt=""
-                aria-hidden
-                width={900}
-                height={1125}
-                className="portrait-plate__photo absolute inset-0 block w-full h-full object-cover"
-              />
-            </div>
-            <figcaption className="label-mono mt-3">
-              Artagers Grigoryan · Yerevan
-            </figcaption>
-          </figure>
           </div>
         </div>
       </section>
