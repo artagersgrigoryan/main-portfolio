@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, useRef, lazy, Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import SmoothScroll, { useLenis } from './components/SmoothScroll';
+import { releaseEntranceGuard } from './lib/entrance';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -22,6 +23,15 @@ const CaseStudyFury = lazy(() => import('./pages/CaseStudyFury'));
 function ScrollReset() {
   const location = useLocation();
   const lenis = useLenis();
+  const first = useRef(true);
+
+  // The prerendered body only exists for the URL that was requested. Once the
+  // router moves, React owns the DOM and entrance animations resume normally.
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    releaseEntranceGuard();
+  }, [location.pathname]);
+
   useEffect(() => {
     if (lenis) {
       lenis.scrollTo(0, { immediate: true });

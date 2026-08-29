@@ -11,6 +11,7 @@ import { useCaseStudies } from '../hooks/useSupabaseData';
 import { trackEvent } from '../lib/analytics';
 import { useLenis } from '../components/SmoothScroll';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { alreadyPainted } from '../lib/entrance';
 
 /**
  * Hand-edited. "Available for work" read as *unemployed* to a prospective
@@ -35,6 +36,14 @@ export default function Home() {
 
   // ── Hero entrance ────────────────────────────────────────────────────
   useEffect(() => {
+    // Prerendered: the hero has been on screen for about a second already.
+    // Fading it in now would read as a glitch, not an entrance.
+    if (alreadyPainted(headingRef.current)) {
+      gsap.set([headingRef.current, subRef.current, metaRef.current, portraitRef.current],
+        { y: 0, opacity: 1 });
+      return;
+    }
+
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
     tl.fromTo(headingRef.current, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 1 })
       .fromTo(subRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, '-=0.5')

@@ -1,5 +1,6 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import gsap from 'gsap';
+import { alreadyPainted } from '../lib/entrance';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -51,7 +52,8 @@ export function useScrollReveal<T extends HTMLElement>(
     // ── Accessibility: skip animation for reduced-motion users ──────────
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (prefersReducedMotion) {
+    // Already painted from prerendered HTML, or motion is off: show it as-is.
+    if (prefersReducedMotion || alreadyPainted(el)) {
       gsap.set(el, { opacity: 1, y: 0, scale: 1 });
       return;
     }
@@ -116,7 +118,7 @@ export function useScrollRevealChildren<T extends HTMLElement>(
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || alreadyPainted(children[0])) {
       gsap.set(children, { opacity: 1, y: 0, scale: 1 });
       return;
     }

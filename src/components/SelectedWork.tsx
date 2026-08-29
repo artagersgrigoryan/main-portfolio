@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import ProjectRow from './ProjectRow';
 import type { CaseStudy } from '../lib/supabase';
+import { alreadyPainted } from '../lib/entrance';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,7 +67,7 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
     const rows = gsap.utils.toArray<HTMLElement>(ROW_SELECTOR, listRef.current);
     if (!rows.length) return;
 
-    if (prefersReducedMotion()) {
+    if (prefersReducedMotion() || alreadyPainted(rows[0])) {
       gsap.set(rows, { opacity: 1, y: 0 });
       return;
     }
