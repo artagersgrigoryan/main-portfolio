@@ -1,8 +1,9 @@
 {
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/404/index.html"
     }
   ]
 }

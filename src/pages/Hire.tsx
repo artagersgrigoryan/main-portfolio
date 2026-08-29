@@ -33,11 +33,7 @@ const ARGUMENTS = [
 export default function Hire() {
   const { data: experience, loading } = useWorkExperience();
 
-  usePageMeta({
-    title: 'Hire me — Artagers Grigoryan, Product Designer',
-    description: 'Product designer with four years in iGaming, Web3 and data-heavy platforms who also builds production front-ends. Open to full-time and contract roles.',
-    path: '/hire',
-  });
+  usePageMeta('/hire');
 
   useEffect(() => {
     trackEvent('hire_page_view');

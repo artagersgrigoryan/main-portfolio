@@ -33,7 +33,9 @@ Elements that animate in must start hidden; use the `.gsap-hidden` CSS class or 
 
 `src/App.tsx` wraps everything in `<BrowserRouter>` → `<SmoothScroll>` → `<Layout>`. Routes include `/`, `/about`, `/hire`, `/contact`, `/work/:slug` and `/admin`. `/hire` is the secondary recruiter-facing path (CV, experience, education) — the navbar links to it as "CV", separate from the client-facing "Hire Me →" CTA which targets `/contact`. The footer is hidden on `/admin`. `ScrollReset` (inside Layout) calls `lenis.scrollTo(0)` on every route change.
 
-Each page calls `usePageMeta` (`src/hooks/usePageMeta.ts`) with a `title`, `description` and `path` to set per-route `<title>`, meta description, canonical URL, and Open Graph / Twitter card tags.
+Each page calls `usePageMeta('/some-path')` (`src/hooks/usePageMeta.ts`) to set per-route `<title>`, meta description, canonical URL, and Open Graph / Twitter card tags. The copy itself lives in **`src/data/routeMeta.json`**, not in the components — `scripts/prerender.mjs` reads the same file to bake those tags into static HTML at build time, and two sources would drift invisibly (the static tags are the ones crawlers read and the ones you never see in a browser). Adding a route means adding an entry there.
+
+All canonical and OG URLs use `https://www.artagers.design`. The apex 308-redirects to www, so naming the apex would point every canonical at a redirect.
 
 ### Analytics
 
@@ -60,7 +62,13 @@ The contact form in `src/pages/Contact.tsx` is a qualified project brief (name, 
 
 ### Build Output
 
-`vite-plugin-singlefile` is enabled — the production build inlines all JS/CSS into a single `index.html` file.
+`npm run build` is `tsc --noEmit && vite build && node scripts/prerender.mjs`.
+
+The prerender step writes one static HTML file per route (`dist/about/index.html`, `dist/hire/index.html`, …), each carrying that route's real title, description, canonical and OG tags. Without it, Vercel's rewrite made every path byte-identical to the homepage before JS ran — Googlebot renders JS and recovered, but Bing, LinkedIn, Slack and most LLM crawlers did not. The body still renders client-side; this buys correct metadata for every crawler, not prerendered body copy (that would need a headless browser in the build).
+
+`vercel.json` rewrites only what the filesystem does not match, and sends it to `/404/index.html` so unknown URLs carry 404 metadata and `noindex` in static HTML rather than the homepage's.
+
+`vite-plugin-singlefile` was **removed** — it inlined every asset into one `index.html`, which cannot coexist with one HTML file per route. JS and CSS are now separate cacheable assets shared across routes.
 
 ## Environment Variables
 

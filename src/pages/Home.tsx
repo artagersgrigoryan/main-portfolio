@@ -26,11 +26,7 @@ export default function Home() {
   const heroRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
 
-  usePageMeta({
-    title: 'Artagers Grigoryan — Product Designer for iGaming, Web3 & Dashboards',
-    description: 'Product designer who ships. iGaming, Web3 and data-heavy platforms — designed, and built when you need it live. Yerevan, Armenia.',
-    path: '/',
-  });
+  usePageMeta('/');
   const headingRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);

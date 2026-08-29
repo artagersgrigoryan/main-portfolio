@@ -11,11 +11,7 @@ import { useNoIndex } from '../hooks/useNoIndex';
  * what actually keeps these out of the index.
  */
 export default function NotFound() {
-  usePageMeta({
-    title: 'Page not found — Artagers Grigoryan',
-    description: 'That page does not exist.',
-    path: '/404',
-  });
+  usePageMeta('/404');
   useNoIndex();
 
   return (

@@ -11,11 +11,7 @@ const HOBBIES = [
 ];
 
 export default function About() {
-  usePageMeta({
-    title: 'About — Artagers Grigoryan',
-    description: 'How a fine-art background turned into designing and shipping products for iGaming, Web3 and mobility.',
-    path: '/about',
-  });
+  usePageMeta('/about');
   const stickyImgRef = useRef<HTMLDivElement>(null);
   const bioRef = useRef<HTMLDivElement>(null);
 

@@ -8,11 +8,7 @@ import { usePageMeta } from '../hooks/usePageMeta';
 export default function Contact() {
   const { data: links } = useContactLinks();
 
-  usePageMeta({
-    title: 'Start a project — Artagers Grigoryan',
-    description: 'Tell me what you are building. Project briefs answered within 24 hours.',
-    path: '/contact',
-  });
+  usePageMeta('/contact');
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);

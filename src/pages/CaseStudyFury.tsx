@@ -120,11 +120,7 @@ export default function CaseStudyFury() {
   const heroRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
 
-  usePageMeta({
-    title: 'FURY Telegram Mini-App Games — Case Study',
-    description: 'Eight casino mini-games on one scalable UI system. 16 responsive interfaces designed solo in two weeks, with zero design revisions during development.',
-    path: '/work/telegram-mini-app-games',
-  });
+  usePageMeta('/work/telegram-mini-app-games');
 
   // ── Hero entrance ──────────────────────────────────────────────────────
   useEffect(() => {

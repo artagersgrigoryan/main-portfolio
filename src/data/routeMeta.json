@@ -1,0 +1,26 @@
+{
+  "/": {
+    "title": "Artagers Grigoryan — Product Designer for iGaming, Web3 & Dashboards",
+    "description": "Product designer who ships. iGaming, Web3 and data-heavy platforms — designed, and built when you need it live. Yerevan, Armenia."
+  },
+  "/about": {
+    "title": "About — Artagers Grigoryan",
+    "description": "How a fine-art background turned into designing and shipping products for iGaming, Web3 and mobility."
+  },
+  "/contact": {
+    "title": "Start a project — Artagers Grigoryan",
+    "description": "Tell me what you are building. Project briefs answered within 24 hours."
+  },
+  "/hire": {
+    "title": "Hire me — Artagers Grigoryan, Product Designer",
+    "description": "Product designer with four years in iGaming, Web3 and data-heavy platforms who also builds production front-ends. Open to full-time and contract roles."
+  },
+  "/work/telegram-mini-app-games": {
+    "title": "FURY Telegram Mini-App Games — Case Study",
+    "description": "Eight casino mini-games on one scalable UI system. 16 responsive interfaces designed solo in two weeks, with zero design revisions during development."
+  },
+  "/404": {
+    "title": "Page not found — Artagers Grigoryan",
+    "description": "That page does not exist."
+  }
+}
