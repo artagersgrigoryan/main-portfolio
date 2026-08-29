@@ -2,66 +2,33 @@
 
 > Product designer with 4+ years across iGaming, Web3 and mobility, who also builds and deploys production front-ends. Designs the product, and ships the working interface when a client needs it live rather than drawn. Founder of PromptStation. Based in Yerevan, Armenia; works remotely worldwide.
 
-## Contact
+**Works with:** teams that have engineers and need design plus a dev-ready handoff, and founders who need the product live rather than drawn.
 
-- Website: https://www.artagers.design
-- Start a project: https://www.artagers.design/contact
-- For hiring teams: https://www.artagers.design/hire
-- Email: artagersgrigoryan@gmail.com
-- Location: Yerevan, Armenia (GMT+4)
+**Design:** product design for online casino and betting platforms, Web3 and crypto products, and data-heavy dashboards. User research, information architecture, interaction design, visual design, prototyping, UI design, accessibility, design systems. Figma, Webflow, Tilda, Adobe Illustrator, Photoshop, Premiere Pro, After Effects.
 
-## What he does
+**Engineering:** Next.js 15 (App Router), React, TypeScript on the front end. Node.js, PostgreSQL, Prisma ORM, schema design, migrations, seeding, auth and OTP reset flows on the back end. Vercel, Railway, DNS and domain management, deployment and monitoring. Google Search Console, XML sitemaps, crawl-budget management and analytics tag integration.
 
-- Product design for online casino and betting platforms, Web3 and crypto products, and data-heavy dashboards.
-- Design systems and dev-ready handoff for teams that have engineers.
-- End-to-end delivery — design plus production front-end — for founders who need a product live.
+**Experience:** Product Designer at UXCentury (casino and custom game platforms, betting dashboards, Telegram-ecosystem games). Freelance UX/UI Designer since 2020 (blockchain gaming and lottery platforms, Telegram bot onboarding flows). Founder & Head of Design at OneRide. UX/UI Mentor at EIF (Enterprise Incubator Foundation). UX/UI Designer at TechMind. Co-Founder & UX/UI Designer at UnityX.
 
-## Design skills
+**Languages:** Armenian (native), Russian (fluent), English (conversational).
 
-User research, information architecture, interaction design, visual design, prototyping, UI design, accessibility, design systems.
+**Availability:** taking on new client projects, and open to full-time roles. Replies within 24 hours. Yerevan, Armenia (GMT+4).
 
-## Design tools
+## Pages
 
-Figma, Webflow, Tilda, Adobe Illustrator, Photoshop, Premiere Pro, After Effects.
-
-## Engineering
-
-- Frontend: Next.js 15 (App Router), React, TypeScript.
-- Backend: Node.js, PostgreSQL, Prisma ORM, schema design, migrations, seeding, auth and OTP reset flows.
-- Infrastructure: Vercel, Railway, DNS and domain management, deployment and monitoring.
-- Web growth: Google Search Console, XML sitemaps, crawl-budget management, analytics tag integration.
+- [Homepage](https://www.artagers.design/): what he does, selected work, the two ways to hire him, and how a project runs.
+- [Start a project](https://www.artagers.design/contact): project brief form — type, need, timeline, budget. Answered within 24 hours.
+- [For hiring teams](https://www.artagers.design/hire): CV, experience and education, for recruiters and hiring managers rather than clients.
+- [About](https://www.artagers.design/about): how a fine-art background turned into designing and shipping products.
 
 ## Selected work
 
-### FURY — Telegram mini-app casino games
-Eight casino mini-games (Crash, Mines, Plinko, Dice and more) on one scalable UI system. 16 responsive interfaces for desktop and mobile, designed solo in Figma in two weeks, with zero design revisions during development.
-https://www.artagers.design/work/telegram-mini-app-games
+- [FURY — Telegram mini-app casino games](https://www.artagers.design/work/telegram-mini-app-games): eight casino mini-games (Crash, Mines, Plinko, Dice and more) on one scalable UI system. 16 responsive interfaces for desktop and mobile, designed solo in Figma in two weeks, with zero design revisions during development.
+- [MakeYourCoin — token launch platform](https://apps.apple.com/us/app/makeyourcoin/id6740451339): token creation and deployment in under a minute with no code, across Solana, Ethereum, BSC, Polygon, Arbitrum, Base and TON. Template-based creation, minting and burning controls, and a management dashboard. Shipped on web, iOS and Android.
+- [PromptStation — founder, designer and developer](https://www.promptstation.online/en): a free tool that turns 13 questions into a complete website brief for AI builders and coding tools. Founded, designed, built and deployed solo on Next.js.
+- [OneRide — carsharing, founder](https://www.behance.net/gallery/222825727/OneRide-Mobile-App): founded a regional carsharing service in Armenia. Six months of user interviews and analysis, full UX flows and UI, built with a developer and launched with three partners. Closed after two months once the operational problems proved larger than the product ones. Research documented on Behance.
 
-### MakeYourCoin — token launch platform
-Token creation and deployment in under a minute with no code, across Solana, Ethereum, BSC, Polygon, Arbitrum, Base and TON. Template-based creation, minting and burning controls, and a management dashboard. Shipped on web, iOS and Android.
-https://apps.apple.com/us/app/makeyourcoin/id6740451339
+## Optional
 
-### PromptStation — founder, designer and developer
-A free tool that turns 13 questions into a complete website brief for AI builders and coding tools. Founded, designed, built and deployed solo on Next.js.
-https://www.promptstation.online/en
-
-### OneRide — carsharing, founder
-Founded a regional carsharing service in Armenia. Six months of user interviews and analysis, full UX flows and UI, built with a developer and launched with three partners. Closed after two months once the operational problems proved larger than the product ones. Research documented on Behance.
-https://www.behance.net/gallery/222825727/OneRide-Mobile-App
-
-## Experience
-
-- Product Designer, UXCentury — casino and custom game platforms, betting dashboards, Telegram-ecosystem games.
-- Freelance UX/UI Designer, 2020–present — blockchain gaming and lottery platforms, Telegram bot onboarding flows.
-- Founder & Head of Design, OneRide — see above.
-- UX/UI Mentor, EIF (Enterprise Incubator Foundation) — mentored cohorts in UX/UI, web design and Figma.
-- UX/UI Designer, TechMind — user research, usability testing, wireframes and prototypes.
-- Co-Founder & UX/UI Designer, UnityX — design studio for mobile and web clients.
-
-## Languages
-
-Armenian (native), Russian (fluent), English (conversational).
-
-## Availability
-
-Taking on new client projects. Also open to full-time roles — details at https://www.artagers.design/hire. Replies within 24 hours.
+- [Email](mailto:artagersgrigoryan@gmail.com): direct contact.
+- [Sitemap](https://www.artagers.design/sitemap.xml): every indexable page on the site.
