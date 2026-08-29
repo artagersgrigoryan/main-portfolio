@@ -51,7 +51,7 @@ let chromium;
 try {
   ({ chromium } = await import('playwright'));
 } catch {
-  console.log('  playwright not installed — keeping head-only shells');
+  console.log('  PLAYWRIGHT NOT INSTALLED — keeping head-only shells');
   process.exit(0);
 }
 
@@ -59,7 +59,9 @@ let browser;
 try {
   browser = await chromium.launch();
 } catch (err) {
-  console.log(`  browser would not launch (${String(err).split('\n')[0].slice(0, 80)}) — keeping head-only shells`);
+  console.log('  BROWSER WOULD NOT LAUNCH — keeping head-only shells.');
+  console.log(`  PLAYWRIGHT_BROWSERS_PATH=${process.env.PLAYWRIGHT_BROWSERS_PATH ?? '(unset)'}`);
+  console.log(`  ${String(err).split('\n').slice(0, 4).join('\n  ')}`);
   process.exit(0);
 }
 

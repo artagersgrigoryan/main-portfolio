@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && node scripts/prerender.mjs && node scripts/prerender-bodies.mjs",
+    "build": "tsc --noEmit && vite build && node scripts/prerender.mjs && (PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium || true) && PLAYWRIGHT_BROWSERS_PATH=0 node scripts/prerender-bodies.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },
