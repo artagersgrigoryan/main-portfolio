@@ -61,14 +61,10 @@
     }
     </script>
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQ33QWSJ7C"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-YQ33QWSJ7C');
-    </script>
+    <!-- GA4 (G-YQ33QWSJ7C) is loaded by the GTM container above, not here.
+         Both were running: three requests to googletagmanager.com and 449 KB
+         of analytics against a 202 KB app, with gtag/js fetched twice. GTM is
+         the one kept because it may carry tags this file cannot see. -->
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

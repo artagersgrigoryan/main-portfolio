@@ -1,7 +1,12 @@
 {
   "/": {
     "title": "Artagers Grigoryan — Product Designer for iGaming, Web3 & Dashboards",
-    "description": "Product designer who ships. iGaming, Web3 and data-heavy platforms — designed, and built when you need it live. Yerevan, Armenia."
+    "description": "Product designer who ships. iGaming, Web3 and data-heavy platforms — designed, and built when you need it live. Yerevan, Armenia.",
+    "preloadImage": {
+      "href": "/hero-portrait.webp",
+      "srcset": "/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w",
+      "sizes": "(max-width: 1023px) 80vw, 46vw"
+    }
   },
   "/about": {
     "title": "About — Artagers Grigoryan",

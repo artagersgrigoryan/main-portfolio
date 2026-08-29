@@ -37,7 +37,7 @@ function setTag(html, pattern, replacement) {
     : html.replace('</head>', `    ${replacement}\n  </head>`);
 }
 
-function render(path, { title, description }) {
+function render(path, { title, description, preloadImage }) {
   const url = path === '/' ? `${ORIGIN}/` : `${ORIGIN}${path}`;
   const t = escape(title);
   const d = escape(description);
@@ -51,6 +51,18 @@ function render(path, { title, description }) {
   html = setTag(html, /<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${url}" />`);
   html = setTag(html, /<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${t}" />`);
   html = setTag(html, /<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${d}" />`);
+
+  // The LCP image, started at parse time. Without this the browser cannot even
+  // begin the download until React has booted and created the <img> — 2.8s of
+  // pure Load Delay on throttled mobile, and the reason fetchpriority on the
+  // element alone did nothing: you cannot prioritise a node that isn't there.
+  if (preloadImage) {
+    const { href, srcset, sizes } = preloadImage;
+    html = html.replace(
+      '</head>',
+      `    <link rel="preload" as="image" href="${href}" imagesrcset="${srcset}" imagesizes="${sizes}" fetchpriority="high" />\n  </head>`
+    );
+  }
 
   // A 404 must never be indexed, whatever else it says.
   if (path === '/404') {

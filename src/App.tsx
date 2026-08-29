@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import SmoothScroll, { useLenis } from './components/SmoothScroll';
@@ -9,9 +9,14 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Hire from './pages/Hire';
-import Admin from './pages/Admin';
-import CaseStudyFury from './pages/CaseStudyFury';
 import NotFound from './pages/NotFound';
+
+// Split out of the main bundle. The admin panel is for one person and ships the
+// whole editing UI; the case study is a long asset-heavy page most visitors
+// never open. Together they were 120 KB of the 202 KB bundle that every mobile
+// visitor downloaded and parsed before the homepage could paint.
+const Admin = lazy(() => import('./pages/Admin'));
+const CaseStudyFury = lazy(() => import('./pages/CaseStudyFury'));
 
 // Scroll to top on route change
 function ScrollReset() {
@@ -35,6 +40,9 @@ function Layout() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1">
+        {/* Only the two lazy routes can suspend; everything else is in the
+            main bundle and renders synchronously, so this never flashes. */}
+        <Suspense fallback={<div className="min-h-screen" />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -44,6 +52,7 @@ function Layout() {
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </div>
       {!isAdmin && <Footer />}
       <ScrollReset />
