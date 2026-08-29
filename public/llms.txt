@@ -4,9 +4,9 @@
 
 ## Contact
 
-- Website: https://artagers.design
-- Start a project: https://artagers.design/contact
-- For hiring teams: https://artagers.design/hire
+- Website: https://www.artagers.design
+- Start a project: https://www.artagers.design/contact
+- For hiring teams: https://www.artagers.design/hire
 - Email: artagersgrigoryan@gmail.com
 - Location: Yerevan, Armenia (GMT+4)
 
@@ -35,7 +35,7 @@ Figma, Webflow, Tilda, Adobe Illustrator, Photoshop, Premiere Pro, After Effects
 
 ### FURY — Telegram mini-app casino games
 Eight casino mini-games (Crash, Mines, Plinko, Dice and more) on one scalable UI system. 16 responsive interfaces for desktop and mobile, designed solo in Figma in two weeks, with zero design revisions during development.
-https://artagers.design/work/telegram-mini-app-games
+https://www.artagers.design/work/telegram-mini-app-games
 
 ### MakeYourCoin — token launch platform
 Token creation and deployment in under a minute with no code, across Solana, Ethereum, BSC, Polygon, Arbitrum, Base and TON. Template-based creation, minting and burning controls, and a management dashboard. Shipped on web, iOS and Android.
@@ -64,4 +64,4 @@ Armenian (native), Russian (fluent), English (conversational).
 
 ## Availability
 
-Taking on new client projects. Also open to full-time roles — details at https://artagers.design/hire. Replies within 24 hours.
+Taking on new client projects. Also open to full-time roles — details at https://www.artagers.design/hire. Replies within 24 hours.

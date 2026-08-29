@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://artagers.design/sitemap.xml
+Sitemap: https://www.artagers.design/sitemap.xml

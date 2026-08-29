@@ -96,6 +96,8 @@ export default function Home() {
                 srcSet="/hero-portrait-sm.webp 700w, /hero-portrait.webp 1200w"
                 sizes="(max-width: 1023px) 80vw, 46vw"
                 alt="Artagers Grigoryan"
+                /* The LCP element on every visit. */
+                fetchPriority="high"
                 width={1200}
                 height={1986}
                 className="hero-portrait"

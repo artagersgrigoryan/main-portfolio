@@ -390,6 +390,9 @@ export default function SelectedWork({ projects, loading }: SelectedWorkProps) {
               key={project.id}
               src={project.image_url}
               alt=""
+              /* In the DOM from first paint but invisible until hover — it must
+                 not compete with the hero portrait, which is the LCP element. */
+              fetchPriority="low"
               className="absolute inset-0 w-full h-full object-cover"
               style={{ opacity: i === active ? 1 : 0, transition: 'opacity 0.25s ease' }}
               onLoad={(e) => {

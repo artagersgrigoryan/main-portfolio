@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase, type CaseStudy, type WorkExperience, type ContactLink } from '../lib/supabase';
 import { useCaseStudies, useWorkExperience, useContactLinks } from '../hooks/useSupabaseData';
+import { useNoIndex } from '../hooks/useNoIndex';
 import { uploadCover, fetchImageAsBlob, isStorageUrl } from '../lib/uploadImage';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -616,21 +617,8 @@ export default function Admin() {
     return () => subscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    document.title = 'Admin';
-    let tag = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
-    const created = !tag;
-    if (created) {
-      tag = document.createElement('meta');
-      tag.setAttribute('name', 'robots');
-      document.head.appendChild(tag);
-    }
-    tag!.content = 'noindex, nofollow';
-    return () => {
-      if (created) tag!.remove();
-      else tag!.content = 'index, follow';
-    };
-  }, []);
+  useEffect(() => { document.title = 'Admin'; }, []);
+  useNoIndex();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

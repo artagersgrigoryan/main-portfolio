@@ -11,6 +11,7 @@ import Contact from './pages/Contact';
 import Hire from './pages/Hire';
 import Admin from './pages/Admin';
 import CaseStudyFury from './pages/CaseStudyFury';
+import NotFound from './pages/NotFound';
 
 // Scroll to top on route change
 function ScrollReset() {
@@ -41,6 +42,7 @@ function Layout() {
           <Route path="/hire" element={<Hire />} />
           <Route path="/work/telegram-mini-app-games" element={<CaseStudyFury />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       {!isAdmin && <Footer />}

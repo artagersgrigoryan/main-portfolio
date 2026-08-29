@@ -7,7 +7,9 @@ export interface PageMeta {
   path: string;
 }
 
-const ORIGIN = 'https://artagers.design';
+/* The apex 308-redirects to www, so canonicals must name www — a canonical
+   pointing at a redirect is a signal that argues with itself. */
+const ORIGIN = 'https://www.artagers.design';
 
 /** Creates the tag if absent, updates it if present, and leaves it in place on
  *  unmount — the next route's call overwrites it, so there is nothing to clean up. */
