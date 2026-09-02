@@ -440,12 +440,12 @@ function ContactsAdmin() {
               <AdminField label="Label (e.g. Email, LinkedIn)" value={editing.label || ''} onChange={v => setEditing({ ...editing, label: v })} />
               <AdminField label="Display Value" value={editing.value || ''} onChange={v => setEditing({ ...editing, value: v })} />
               <AdminField label="URL / href" value={editing.href || ''} onChange={v => setEditing({ ...editing, href: v })} />
-              <div>
-                <label className="label-mono block mb-2">Type</label>
+              <div className="field">
+                <label className="field-label">Type</label>
                 <select
                   value={editing.type || 'other'}
                   onChange={e => setEditing({ ...editing, type: e.target.value as ContactLink['type'] })}
-                  className="w-full border-2 border-[#0a0a0a] px-3 py-2 font-mono text-sm bg-white"
+                  className="field-input field-select"
                 >
                   {['email', 'phone', 'linkedin', 'dribbble', 'other'].map(t => (
                     <option key={t} value={t}>{t}</option>
@@ -504,15 +504,15 @@ function AdminField({
   label: string; value: string; onChange: (v: string) => void; multiline?: boolean; type?: string; placeholder?: string; autoFocus?: boolean;
 }) {
   return (
-    <div className="border-2 border-[#0a0a0a]">
-      <label className="block px-3 pt-3 label-mono">{label}</label>
+    <div className="field">
+      <label className="field-label">{label}</label>
       {multiline ? (
         <textarea
           value={value}
           onChange={e => onChange(e.target.value)}
           rows={4}
           placeholder={placeholder}
-          className="w-full px-3 py-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors resize-none"
+          className="field-input resize-y"
         />
       ) : (
         <input
@@ -521,7 +521,7 @@ function AdminField({
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="w-full px-3 py-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
+          className="field-input"
         />
       )}
     </div>
@@ -555,10 +555,10 @@ function ImageField({
   };
 
   return (
-    <div className="border-2 border-[#0a0a0a]">
-      <label className="block px-3 pt-3 label-mono">Cover Image</label>
+    <div className="field">
+      <label className="field-label">Cover Image</label>
 
-      <div className="flex items-center gap-3 px-3 pt-3">
+      <div className="flex items-center gap-3 px-4 pt-3">
         {value && !broken ? (
           <img
             src={value}
@@ -595,7 +595,7 @@ function ImageField({
         value={value}
         onChange={e => { onChange(e.target.value); setBroken(false); }}
         placeholder="…or paste an image URL"
-        className="w-full px-3 py-2 mt-2 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
+        className="field-input mt-2"
       />
     </div>
   );

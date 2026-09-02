@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateBrief, formatBriefMessage } from './_brief';
+import { validateBrief, formatBriefMessage, briefFieldIssues, toBrief } from './_brief';
 
 const valid = {
   name: 'Jane Founder',
@@ -69,6 +69,57 @@ describe('validateBrief', () => {
       message: 'x'.repeat(2500),
     });
     expect(result.ok).toBe(true);
+  });
+
+  it('rejects a malformed email address', () => {
+    expect(validateBrief({ ...valid, email: 'john@' })).toEqual({
+      ok: false,
+      error: 'Invalid email address',
+    });
+  });
+
+  it('reports a missing field before a malformed email', () => {
+    // Precedence matters: a visitor who left the form blank should be told
+    // that, not lectured about email syntax.
+    const result = validateBrief({ ...valid, name: '', email: 'nope' });
+    expect(result).toEqual({ ok: false, error: 'Missing required fields' });
+  });
+});
+
+describe('briefFieldIssues', () => {
+  it('finds no issues in a valid brief', () => {
+    expect(briefFieldIssues(toBrief(valid))).toEqual({});
+  });
+
+  it('keys every issue by the field that owns it', () => {
+    const issues = briefFieldIssues(toBrief({ ...valid, name: '', email: 'john@', need: '' }));
+    expect(Object.keys(issues).sort()).toEqual(['email', 'name', 'need']);
+    expect(issues.name?.kind).toBe('required');
+    expect(issues.email?.kind).toBe('format');
+    expect(issues.need?.kind).toBe('required');
+  });
+
+  it('reports a required field once, not also as malformed', () => {
+    const issues = briefFieldIssues(toBrief({ ...valid, email: '   ' }));
+    expect(issues.email).toEqual({ kind: 'required', message: 'Email address is required' });
+  });
+
+  it('flags an over-length field with its own cap', () => {
+    const issues = briefFieldIssues(toBrief({ ...valid, message: 'x'.repeat(3901) }));
+    expect(issues.message).toEqual({
+      kind: 'tooLong',
+      message: 'Keep this under 3900 characters',
+    });
+  });
+
+  it('flags a value outside an allowed list', () => {
+    const issues = briefFieldIssues(toBrief({ ...valid, budget: 'a trillion' }));
+    expect(issues.budget?.kind).toBe('invalid');
+  });
+
+  it('leaves optional fields alone when empty', () => {
+    const { timeline, budget, links, ...required } = valid;
+    expect(briefFieldIssues(toBrief(required))).toEqual({});
   });
 });
 

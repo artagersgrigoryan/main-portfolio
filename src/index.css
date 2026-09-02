@@ -205,12 +205,145 @@ body {
   transform: translateY(30px);
 }
 
-/* Admin form focus styles */
-input:focus,
-textarea:focus,
-select:focus {
+/* Fallback focus ring for controls that are not inside a .field box — the
+   Admin cover-type select is the only one left. Fields draw their own; see
+   below. `:focus-visible` rather than `:focus` so a mouse click on a select
+   does not paint a ring nobody asked for. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid #0a0a0a;
   outline-offset: 0;
+}
+
+/* ── Form fields ──────────────────────────────────────────────────────────
+   One bordered box holds a mono label and its control. Every form on the site
+   uses these; the classes exist so the brief form and the admin panel cannot
+   drift apart the way seven copies of a Tailwind string did.
+
+   The box owns the focus state. The control inside must not draw its own —
+   an outline nested inside the 2px border is a black box inside a black box,
+   which is what made the old fields look broken. */
+.field {
+  position: relative;
+  border: 2px solid #0a0a0a;
+  background: #ffffff;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+
+.field:focus-within {
+  background: #f8f8f8;
+  /* An inner 1px on top of the 2px border reads as 3px without resizing the
+     box. Changing border-width would shift every field below it. */
+  box-shadow: inset 0 0 0 1px #0a0a0a;
+}
+
+/* Each field is its own cell. The gap is deliberately tight: the eight fields
+   are one brief, and a wider one would read as eight unrelated blocks. Scoped
+   to an explicit container so other forms keep their own spacing. */
+.field-stack > .field + .field {
+  margin-top: 8px;
+}
+
+.field-label {
+  display: block;
+  padding: 14px 16px 0;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #666;
+  cursor: pointer;
+}
+
+.field-input {
+  width: 100%;
+  /* ~52px tall, clearing the 44px minimum touch target. */
+  padding: 6px 16px 16px;
+  font-family: 'Space Mono', monospace;
+  /* 16px is not a taste decision: below it, iOS Safari zooms the whole page
+     on focus and the visitor has to pinch back out to see the form. */
+  font-size: 16px;
+  line-height: 1.5;
+  color: #0a0a0a;
+  background: transparent;
+  border: 0;
+}
+
+.field-input:focus,
+.field-input:focus-visible {
+  outline: none;
+}
+
+.field-input::placeholder {
+  color: #767676; /* 4.54:1 on white — #bbb was 1.9:1 and unreadable */
+}
+
+/* Chrome repaints autofilled inputs with its own background and font. Two
+   independent defences, because either one alone has a hole: the inset shadow
+   survives the reduced-motion transition override below, and the absurd
+   transition delay survives Chrome re-applying its colour on a timer. */
+.field-input:-webkit-autofill,
+.field-input:-webkit-autofill:hover,
+.field-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0a0a0a;
+  caret-color: #0a0a0a;
+  font-family: 'Space Mono', monospace;
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  transition: background-color 100000s ease-in-out 0s;
+}
+
+.field:focus-within .field-input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #f8f8f8 inset;
+}
+
+/* Native select, restyled. Kept native because the OS picker on a phone beats
+   any custom menu, and it gets keyboard and screen-reader behaviour for free. */
+.field-select {
+  appearance: none;
+  border-radius: 0;
+  cursor: pointer;
+  padding-right: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230a0a0a' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 12px;
+  color-scheme: light; /* a dark-mode OS otherwise repaints the option list */
+}
+
+/* An unchosen select reads as empty, the way a placeholder does. */
+.field-select[data-empty='true'] {
+  color: #767676;
+}
+
+.field-select option {
+  color: #0a0a0a;
+}
+
+/* Invalid state. The message lives inside the box: the fields collapse their
+   borders into one continuous stack, and a message between boxes would break
+   that grid. */
+.field-invalid {
+  border-color: #c00000;
+}
+
+.field-invalid .field-label {
+  color: #c00000;
+}
+
+.field-invalid:focus-within {
+  box-shadow: inset 0 0 0 1px #c00000;
+}
+
+.field-error {
+  padding: 0 16px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #c00000;
 }
 
 /* ── Accessibility: disable animations for reduced-motion users ──────────── */
@@ -228,6 +361,15 @@ select:focus {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* Not an animation — the delay is how an autofilled field keeps our
+     background instead of Chrome's. Killing it here would hand reduced-motion
+     users the broken-looking field everyone else no longer sees. */
+  .field-input:-webkit-autofill,
+  .field-input:-webkit-autofill:hover,
+  .field-input:-webkit-autofill:focus {
+    transition-duration: 100000s !important;
   }
 }
 

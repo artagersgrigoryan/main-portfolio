@@ -1,9 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useContactLinks } from '../hooks/useSupabaseData';
-import { PROJECT_TYPES, NEEDS, TIMELINES, BUDGETS } from '../../api/_brief';
+import {
+  PROJECT_TYPES, NEEDS, TIMELINES, BUDGETS,
+  briefFieldIssues, toBrief, type Brief, type FieldIssues,
+} from '../../api/_brief';
 import { trackEvent } from '../lib/analytics';
 import { usePageMeta } from '../hooks/usePageMeta';
+import { useLenis } from '../components/SmoothScroll';
+
+const EMPTY_BRIEF: Brief = {
+  name: '', email: '', projectType: '', need: '',
+  timeline: '', budget: '', links: '', message: '',
+};
+
+/* Top to bottom, so a failed submit sends the visitor to the first thing they
+   need to fix rather than an arbitrary one. */
+const FIELD_IDS: Record<keyof Brief, string> = {
+  name: 'brief-name',
+  email: 'brief-email',
+  projectType: 'brief-project-type',
+  need: 'brief-need',
+  timeline: 'brief-timeline',
+  budget: 'brief-budget',
+  links: 'brief-links',
+  message: 'brief-message',
+};
 
 export default function Contact() {
   const { data: links } = useContactLinks();
@@ -12,11 +34,10 @@ export default function Contact() {
   const headerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const linksRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
 
-  const [formData, setFormData] = useState({
-    name: '', email: '', projectType: '', need: '',
-    timeline: '', budget: '', links: '', message: '',
-  });
+  const [formData, setFormData] = useState<Brief>(EMPTY_BRIEF);
+  const [errors, setErrors] = useState<FieldIssues>({});
   const [started, setStarted] = useState(false);
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -25,6 +46,31 @@ export default function Contact() {
     if (started) return;
     setStarted(true);
     trackEvent('brief_started');
+  };
+
+  /* Editing a field clears its error. An error that survives the fix reads as
+     the form arguing with you. */
+  const setField = (field: keyof Brief) => (value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  /** Focus the first field with a problem and bring it under the fixed navbar. */
+  const revealFirstIssue = (issues: FieldIssues) => {
+    const field = (Object.keys(FIELD_IDS) as (keyof Brief)[]).find(f => issues[f]);
+    if (!field) return;
+    const el = formRef.current?.querySelector<HTMLElement>(`#${FIELD_IDS[field]}`);
+    if (!el) return;
+    // preventScroll, then hand the scroll to Lenis — a native scroll here
+    // fights the smooth-scroll loop and lands in the wrong place.
+    el.focus({ preventScroll: true });
+    if (lenis) lenis.scrollTo(el, { offset: -100 });
+    else el.scrollIntoView({ block: 'center', behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -36,6 +82,18 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // The same rules the serverless function runs, so the form can never
+    // disagree with the API about what a valid brief is.
+    const issues = briefFieldIssues(toBrief(formData));
+    if (Object.keys(issues).length > 0) {
+      setErrors(issues);
+      setStatus('idle');
+      revealFirstIssue(issues);
+      return;
+    }
+
+    setErrors({});
     setStatus('sending');
 
     try {
@@ -56,10 +114,7 @@ export default function Contact() {
         budget: formData.budget || 'unspecified',
       });
       setStatus('sent');
-      setFormData({
-        name: '', email: '', projectType: '', need: '',
-        timeline: '', budget: '', links: '', message: '',
-      });
+      setFormData(EMPTY_BRIEF);
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : '');
       setStatus('error');
@@ -163,85 +218,39 @@ export default function Contact() {
             <p className="label-mono">The Brief</p>
           </div>
 
+          {/* noValidate: the inline errors below replace the browser's own
+              bubbles, which point at one field at a time and vanish on click. */}
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="p-6 md:p-10 space-y-0"
+            noValidate
+            className="p-6 md:p-10 field-stack"
           >
-            {/* Name */}
-            <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-              <label htmlFor="brief-name" className="block px-4 pt-4 label-mono">
-                Your Name *
-              </label>
-              <input
-                id="brief-name"
-                type="text"
-                required
-                autoComplete="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                onFocus={markStarted}
-                placeholder="John Doe"
-                className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb]"
-              />
-            </div>
+            <BriefField id={FIELD_IDS.name} label="Your Name" required autoComplete="name"
+              value={formData.name} onChange={setField('name')} onFocus={markStarted}
+              placeholder="John Doe" error={errors.name?.message} />
 
-            {/* Email */}
-            <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-              <label htmlFor="brief-email" className="block px-4 pt-4 label-mono">
-                Email Address *
-              </label>
-              <input
-                id="brief-email"
-                type="email"
-                required
-                autoComplete="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                onFocus={markStarted}
-                placeholder="john@company.com"
-                className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb]"
-              />
-            </div>
+            <BriefField id={FIELD_IDS.email} label="Email Address" required type="email" autoComplete="email"
+              value={formData.email} onChange={setField('email')} onFocus={markStarted}
+              placeholder="john@company.com" error={errors.email?.message} />
 
-            <BriefSelect id="brief-project-type" label="Project type" value={formData.projectType} options={PROJECT_TYPES} required
-              onChange={(v) => setFormData({ ...formData, projectType: v })} onFocus={markStarted} />
-            <BriefSelect id="brief-need" label="What you need" value={formData.need} options={NEEDS} required
-              onChange={(v) => setFormData({ ...formData, need: v })} onFocus={markStarted} />
-            <BriefSelect id="brief-timeline" label="Timeline" value={formData.timeline} options={TIMELINES}
-              onChange={(v) => setFormData({ ...formData, timeline: v })} onFocus={markStarted} />
-            <BriefSelect id="brief-budget" label="Budget range" value={formData.budget} options={BUDGETS}
-              onChange={(v) => setFormData({ ...formData, budget: v })} onFocus={markStarted} />
+            <BriefSelect id={FIELD_IDS.projectType} label="Project type" value={formData.projectType} options={PROJECT_TYPES} required
+              onChange={setField('projectType')} onFocus={markStarted} error={errors.projectType?.message} />
+            <BriefSelect id={FIELD_IDS.need} label="What you need" value={formData.need} options={NEEDS} required
+              onChange={setField('need')} onFocus={markStarted} error={errors.need?.message} />
+            <BriefSelect id={FIELD_IDS.timeline} label="Timeline" value={formData.timeline} options={TIMELINES}
+              onChange={setField('timeline')} onFocus={markStarted} error={errors.timeline?.message} />
+            <BriefSelect id={FIELD_IDS.budget} label="Budget range" value={formData.budget} options={BUDGETS}
+              onChange={setField('budget')} onFocus={markStarted} error={errors.budget?.message} />
 
-            <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-              <label htmlFor="brief-links" className="block px-4 pt-4 label-mono">Links</label>
-              <input
-                id="brief-links"
-                type="text"
-                value={formData.links}
-                onChange={(e) => setFormData({ ...formData, links: e.target.value })}
-                onFocus={markStarted}
-                placeholder="Your site, deck, or Figma"
-                className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb]"
-              />
-            </div>
+            <BriefField id={FIELD_IDS.links} label="Links"
+              value={formData.links} onChange={setField('links')} onFocus={markStarted}
+              placeholder="Your site, deck, or Figma" error={errors.links?.message} />
 
-            {/* Message */}
-            <div className="border-2 border-[#0a0a0a]">
-              <label htmlFor="brief-message" className="block px-4 pt-4 label-mono">
-                Message *
-              </label>
-              <textarea
-                id="brief-message"
-                required
-                rows={8}
-                value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                onFocus={markStarted}
-                placeholder="Tell me about your project, timeline, and goals..."
-                className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors placeholder:text-[#bbb] resize-none"
-              />
-            </div>
+            <BriefField id={FIELD_IDS.message} label="Message" required multiline rows={8}
+              value={formData.message} onChange={setField('message')} onFocus={markStarted}
+              placeholder="Tell me about your project, timeline, and goals..."
+              error={errors.message?.message} />
 
             {/* Submit */}
             <div className="pt-6 flex items-center gap-6">
@@ -271,8 +280,65 @@ export default function Contact() {
   );
 }
 
+/* `required` stays on the controls for assistive tech even though noValidate
+   stops the browser acting on it — it is what announces the field as required. */
+
+function BriefField({
+  id, label, value, onChange, onFocus, error, required, type = 'text',
+  placeholder, autoComplete, multiline, rows,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onFocus: () => void;
+  error?: string;
+  required?: boolean;
+  type?: string;
+  placeholder?: string;
+  autoComplete?: string;
+  multiline?: boolean;
+  rows?: number;
+}) {
+  const errorId = `${id}-error`;
+  const shared = {
+    id,
+    value,
+    required,
+    placeholder,
+    autoComplete,
+    onFocus,
+    'aria-invalid': error ? true : undefined,
+    'aria-describedby': error ? errorId : undefined,
+  };
+
+  return (
+    <div className={`field${error ? ' field-invalid' : ''}`}>
+      <label htmlFor={id} className="field-label">
+        {label}{required ? ' *' : ''}
+      </label>
+      {multiline ? (
+        <textarea
+          {...shared}
+          rows={rows}
+          onChange={(e) => onChange(e.target.value)}
+          className="field-input resize-y"
+        />
+      ) : (
+        <input
+          {...shared}
+          type={type}
+          onChange={(e) => onChange(e.target.value)}
+          className="field-input"
+        />
+      )}
+      {error && <p id={errorId} className="field-error">{error}</p>}
+    </div>
+  );
+}
+
 function BriefSelect({
-  id, label, value, options, required, onChange, onFocus,
+  id, label, value, options, required, onChange, onFocus, error,
 }: {
   id: string;
   label: string;
@@ -281,23 +347,32 @@ function BriefSelect({
   required?: boolean;
   onChange: (v: string) => void;
   onFocus: () => void;
+  error?: string;
 }) {
+  const errorId = `${id}-error`;
+
   return (
-    <div className="border-2 border-[#0a0a0a] mb-[-2px]">
-      <label htmlFor={id} className="block px-4 pt-4 label-mono">
+    <div className={`field${error ? ' field-invalid' : ''}`}>
+      <label htmlFor={id} className="field-label">
         {label}{required ? ' *' : ''}
       </label>
       <select
         id={id}
         required={required}
         value={value}
+        // Drives the gray "Select…" state in CSS; :invalid would only cover
+        // the required ones, leaving timeline and budget looking answered.
+        data-empty={value === '' ? 'true' : undefined}
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
-        className="w-full px-4 py-3 font-mono text-sm bg-transparent focus:bg-[#f8f8f8] transition-colors"
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className="field-input field-select"
       >
         <option value="">Select…</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>
+      {error && <p id={errorId} className="field-error">{error}</p>}
     </div>
   );
 }
