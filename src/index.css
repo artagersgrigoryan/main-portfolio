@@ -516,8 +516,12 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
-/* The cutout: above the type, below the copy. It may cross the headline but
-   must never sit on top of words a visitor has to read. */
+/* The cutout: above the type, below the copy.
+   It crosses the headline, and from 1024 up it covers the "UC" of PRODUCTION —
+   deliberately. He is bottom-anchored at the wrists, so the desktop
+   enlargement (--portrait-scale, below) can only grow upward into the type;
+   holding his head clear would mean cropping the crossed arms instead, and
+   the arms won. Do not "fix" the overlap by shrinking him. */
 /* The stage owns whatever vertical space is left between the headline and the
    copy. The cutout is sized from it, so it grows and shrinks with the viewport
    instead of sitting at a guessed fraction of it. */
@@ -548,21 +552,31 @@ select:focus-visible {
      envelope multiplied by this, so re-cropping the source means changing one
      number here rather than nine decimals across three breakpoints. */
   --portrait-aspect: 0.6042;
+  /* Phone enlargement. A separate knob from the desktop one further down,
+     because the limit here is different: he already fills ~90vw, so the phone's
+     own width runs out long before the headline does. */
+  --portrait-scale: 1.1;
   position: absolute;
   left: 50%;
-  bottom: 0;
-  /* 62% of him sits below the stage, behind the copy and the buttons; the
-     remaining 38% is sized to exactly fill the stage, so his head reaches the
-     headline and never covers it. 263% is the height at which those two
-     agree. The vw term caps him on roomy screens so he cannot outgrow the
-     viewport — on short ones the stage term wins and he shrinks instead of
-     climbing into the type. */
-  transform: translate(-50%, 62%);
-  height: min(263%, 155vw);
+  /* Anchored by his HEAD, not his feet. The top edge sits a fixed distance
+     above the stage foot — 38% of the scale-1 height, which is the only part
+     of him that was ever visible — so growth can only run downward, into the
+     62% already hidden behind the copy. Anchoring at `bottom` instead (what
+     this did before) pushes his head up into the headline as he grows, and
+     over-shoots whenever the width cap clamps the height. */
+  top: calc(100% - min(99.94%, 58.9vw));
+  bottom: auto;
+  transform: translateX(-50%);
+  /* 263% is the height at which that visible 38% exactly fills the stage, so
+     his head reaches the headline without covering it; on a short viewport
+     this term wins and he shrinks rather than climbing into the type. The vw
+     term is a hard width ceiling and so does NOT scale: 163vw of height is
+     98.5vw of width, one notch off bleeding past both edges. */
+  height: min(calc(263% * var(--portrait-scale)), 163vw);
   width: auto;
   /* Preflight sets `img { max-width: 100% }`, which with a fixed height
-     compresses him horizontally instead of scaling him down. The 155vw cap
-     above already keeps his width under 94vw, so nothing needs clamping. */
+     compresses him horizontally instead of scaling him down. The cap above
+     already keeps his width under 99vw, so nothing needs clamping. */
   max-width: none;
 }
 
@@ -620,6 +634,11 @@ select:focus-visible {
   .hero-portrait {
     left: auto;
     right: 1.5rem;
+    /* Back to foot-anchored from here up: the phone rule above pins his head
+       with `top`, which would stretch him between both edges once height is
+       auto. */
+    top: auto;
+    bottom: 0;
     /* Cropped at the wrists: the watch sits at 76.5% of the source image, so
        shifting down by the remaining 23.5% lands it exactly on the bottom
        edge at every size. The hero clips the overhang. */
@@ -664,7 +683,12 @@ select:focus-visible {
   .hero-portrait {
     right: 17rem;
     --portrait-height: clamp(24rem, 70vh, 44rem);
-    width: calc(var(--portrait-height) * var(--portrait-aspect));
+    /* Desktop-only enlargement, +20%. One knob rather than the same factor
+       sprinkled through the width calcs below — the 31.2vw and height guards
+       still apply, they just cap a bigger figure. Tablet and phone widths
+       never read this, so they are untouched. */
+    --portrait-scale: 1.2;
+    width: calc(var(--portrait-height) * var(--portrait-aspect) * var(--portrait-scale));
   }
 
   .hero-lower {
@@ -689,7 +713,10 @@ select:focus-visible {
    narrow one, and whichever is scarcer wins. */
 @media (min-width: 1280px) {
   .hero-portrait {
-    width: min(calc(var(--portrait-height) * var(--portrait-aspect) * 1.44), 31.2vw);
+    width: min(
+      calc(var(--portrait-height) * var(--portrait-aspect) * 1.44 * var(--portrait-scale)),
+      calc(31.2vw * var(--portrait-scale))
+    );
   }
 }
 
