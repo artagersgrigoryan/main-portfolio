@@ -73,6 +73,9 @@ for (const path of Object.keys(routeMeta)) {
   if (!existsSync(out)) continue;
 
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  // GA4 is loaded straight from index.html, so without this every build would
+  // record one fake page view per route from the build machine.
+  await page.route(/googletagmanager\.com|google-analytics\.com|analytics\.google\.com/, (r) => r.abort());
   try {
     await page.goto(`http://localhost:${port}${path}`, { waitUntil: 'networkidle', timeout: 30000 });
     // Let the entrance timelines finish so nothing is captured mid-fade.

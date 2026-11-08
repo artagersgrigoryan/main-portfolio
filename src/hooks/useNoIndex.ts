@@ -4,7 +4,7 @@ import { useEffect } from 'react';
  * Keeps a page out of the index for as long as it is mounted.
  *
  * The SPA serves every route from one index.html, so `robots` has to be
- * written at runtime and put back on the way out — otherwise visiting /admin
+ * written at runtime and put back on the way out — otherwise visiting a 404
  * and then navigating home would leave the whole site noindexed.
  */
 export function useNoIndex(): void {

@@ -12,11 +12,9 @@ import Contact from './pages/Contact';
 import Hire from './pages/Hire';
 import NotFound from './pages/NotFound';
 
-// Split out of the main bundle. The admin panel is for one person and ships the
-// whole editing UI; the case study is a long asset-heavy page most visitors
-// never open. Together they were 120 KB of the 202 KB bundle that every mobile
-// visitor downloaded and parsed before the homepage could paint.
-const Admin = lazy(() => import('./pages/Admin'));
+// Split out of the main bundle: the case study is a long asset-heavy page most
+// visitors never open, and every mobile visitor would otherwise download and
+// parse it before the homepage could paint.
 const CaseStudyFury = lazy(() => import('./pages/CaseStudyFury'));
 
 // Scroll to top on route change
@@ -43,9 +41,6 @@ function ScrollReset() {
 }
 
 function Layout() {
-  const location = useLocation();
-  const isAdmin = location.pathname === '/admin';
-
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -59,12 +54,11 @@ function Layout() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/hire" element={<Hire />} />
           <Route path="/work/telegram-mini-app-games" element={<CaseStudyFury />} />
-          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
       </div>
-      {!isAdmin && <Footer />}
+      <Footer />
       <ScrollReset />
     </div>
   );

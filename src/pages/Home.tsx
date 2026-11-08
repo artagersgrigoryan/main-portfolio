@@ -15,8 +15,8 @@ import { alreadyPainted } from '../lib/entrance';
 
 /**
  * Hand-edited. "Available for work" read as *unemployed* to a prospective
- * client; capacity reads as demand. Not wired to Supabase — an admin field for
- * one string is not worth the schema change.
+ * client; capacity reads as demand. Not in Supabase — one string is not worth
+ * a schema change.
  */
 const CAPACITY = '2 project slots open';
 

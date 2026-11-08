@@ -22,19 +22,13 @@ export default function Footer() {
           </span>
         </div>
 
-        {/* Right — Admin link (hidden, in footer) */}
+        {/* Right */}
         <div className="flex items-center px-6 py-6">
           <Link
             to="/hire"
-            className="font-mono text-xs text-[#666] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors mr-6"
+            className="font-mono text-xs text-[#666] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors"
           >
             For hiring teams
-          </Link>
-          <Link
-            to="/admin"
-            className="font-mono text-xs text-[#ccc] hover:text-[#0a0a0a] uppercase tracking-widest transition-colors"
-          >
-            ⚙ admin
           </Link>
         </div>
       </div>

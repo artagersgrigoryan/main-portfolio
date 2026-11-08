@@ -7,13 +7,17 @@
     <meta name="description" content="Product Designer specializing in UX/UI for online casinos, custom games, complex dashboards, and Telegram ecosystem games." />
     
     
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-MJHP7PC2');</script>
-    <!-- End Google Tag Manager -->
+    <!-- Google Analytics 4, loaded directly. It used to go through a GTM
+         container (GTM-MJHP7PC2) that was never given a GA4 tag, so nothing
+         was ever recorded. SPA route changes are counted by GA4's enhanced
+         measurement ("page changes based on browser history events"). -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YQ33QWSJ7C"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YQ33QWSJ7C');
+    </script>
 
 
     
@@ -61,20 +65,11 @@
     }
     </script>
 
-    <!-- GA4 (G-YQ33QWSJ7C) is loaded by the GTM container above, not here.
-         Both were running: three requests to googletagmanager.com and 449 KB
-         of analytics against a 202 KB app, with gtag/js fetched twice. GTM is
-         the one kept because it may carry tags this file cannot see. -->
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MJHP7PC2"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

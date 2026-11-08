@@ -205,9 +205,8 @@ body {
   transform: translateY(30px);
 }
 
-/* Fallback focus ring for controls that are not inside a .field box — the
-   Admin cover-type select is the only one left. Fields draw their own; see
-   below. `:focus-visible` rather than `:focus` so a mouse click on a select
+/* Fallback focus ring for controls that are not inside a .field box.
+   Fields draw their own; see below. `:focus-visible` rather than `:focus` so a mouse click on a select
    does not paint a ring nobody asked for. */
 input:focus-visible,
 textarea:focus-visible,
@@ -218,8 +217,7 @@ select:focus-visible {
 
 /* ── Form fields ──────────────────────────────────────────────────────────
    One bordered box holds a mono label and its control. Every form on the site
-   uses these; the classes exist so the brief form and the admin panel cannot
-   drift apart the way seven copies of a Tailwind string did.
+   uses these; the classes exist so forms cannot drift apart the way seven copies of a Tailwind string did.
 
    The box owns the focus state. The control inside must not draw its own —
    an outline nested inside the 2px border is a black box inside a black box,

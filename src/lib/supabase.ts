@@ -103,10 +103,8 @@ CREATE POLICY "Allow public read" ON case_studies FOR SELECT USING (true);
 CREATE POLICY "Allow public read" ON work_experience FOR SELECT USING (true);
 CREATE POLICY "Allow public read" ON contact_links FOR SELECT USING (true);
 
--- Allow all operations (for admin — restrict with auth in production)
-CREATE POLICY "Allow all for admin" ON case_studies FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for admin" ON work_experience FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow all for admin" ON contact_links FOR ALL USING (true) WITH CHECK (true);
+-- No write policies: content is edited in the Supabase dashboard, so RLS
+-- leaves the anon key read-only.
 
 -- Seed initial data — Case Studies
 INSERT INTO case_studies (title, description, image_url, link, tags, display_order) VALUES

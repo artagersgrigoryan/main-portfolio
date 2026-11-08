@@ -21,15 +21,14 @@
     │
     ├── components/
     │   ├── Navbar.tsx                # Fixed top navigation with GSAP entrance animation
-    │   ├── Footer.tsx                # Footer with hidden /admin link
+    │   ├── Footer.tsx                # Footer
     │   ├── ProjectCard.tsx           # Brutalist case study card with GSAP hover effects ★
     │   └── MarqueeBar.tsx            # Scrolling skills marquee strip
     │
     └── pages/
         ├── Home.tsx                  # Hero + Case Studies list (GSAP scroll animations)
         ├── About.tsx                 # Bio + Sticky image + Work Experience + Education
-        ├── Contact.tsx               # Contact links + Contact form
-        └── Admin.tsx                 # Password-protected CMS for all content
+        └── Contact.tsx               # Contact links + Contact form
 ```
 
 ## Database Tables (Supabase PostgreSQL)
@@ -40,7 +39,7 @@
 | `work_experience`| id, job_title, company, date_range, description, display_order |
 | `contact_links`  | id, label, value, href, type, display_order                    |
 
-All tables have `display_order INTEGER` for drag/swap reordering via the Admin panel.
+All tables have `display_order INTEGER`; edit rows in the Supabase dashboard.
 
 ## SQL Schema
 
@@ -53,12 +52,3 @@ The complete SQL schema (with seed data) is embedded as a comment block in:
 2. Go to SQL Editor → paste schema from `src/lib/supabase.ts`
 3. Copy `.env.example` → `.env` and fill in your keys
 4. Run `npm run dev`
-5. Visit `/admin` (link in footer) — default password: `artagers2025`
-
-## Admin Panel Features
-
-- **Case Studies**: Add, Edit, Delete, Reorder (↑↓ swap by display_order)
-- **Work Experience**: Add, Edit, Delete, Reorder positions
-- **Contact Links**: Add, Edit, Delete, Reorder channels
-- Password gate (change `ADMIN_PASSWORD` in `src/pages/Admin.tsx`)
-- Yellow banner when Supabase is not configured (graceful fallback mode)

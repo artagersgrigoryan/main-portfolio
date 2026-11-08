@@ -65,15 +65,15 @@ Elements that animate in must start hidden; use the `.gsap-hidden` CSS class or 
 
 ### Routing & Layout
 
-`src/App.tsx` wraps everything in `<BrowserRouter>` → `<SmoothScroll>` → `<Layout>`. Routes: `/`, `/about`, `/contact`, `/hire`, `/work/telegram-mini-app-games`, `/admin`, and `*` → `NotFound`. There is **no `/work/:slug`** — the FURY case study is its own hardcoded route and component; a second case study means a second route (plus a `routeMeta.json` entry and a `sitemap.xml` line).
+`src/App.tsx` wraps everything in `<BrowserRouter>` → `<SmoothScroll>` → `<Layout>`. Routes: `/`, `/about`, `/contact`, `/hire`, `/work/telegram-mini-app-games`, and `*` → `NotFound`. There is **no `/work/:slug`** — the FURY case study is its own hardcoded route and component; a second case study means a second route (plus a `routeMeta.json` entry and a `sitemap.xml` line).
 
-`Admin` and `CaseStudyFury` are `lazy()`-loaded — together they were 120 KB of a 202 KB bundle every mobile visitor parsed before the homepage could paint. Keep them out of the main chunk. The footer is hidden on `/admin`. `ScrollReset` (inside Layout) calls `lenis.scrollTo(0)` on every route change and releases the entrance guard.
+`CaseStudyFury` is `lazy()`-loaded so every mobile visitor does not parse it before the homepage can paint. Keep it out of the main chunk. `ScrollReset` (inside Layout) calls `lenis.scrollTo(0)` on every route change and releases the entrance guard.
 
 `/hire` is the secondary recruiter-facing path (CV, experience, education) — the navbar links to it as "CV", separate from the client-facing "Hire Me →" CTA which targets `/contact`.
 
 Each page calls `usePageMeta('/some-path')` (`src/hooks/usePageMeta.ts`) to set per-route `<title>`, meta description, canonical URL, and Open Graph / Twitter card tags. The copy itself lives in **`src/data/routeMeta.json`**, not in the components — `scripts/prerender.mjs` reads the same file to bake those tags into static HTML at build time, and two sources would drift invisibly (the static tags are the ones crawlers read and the ones you never see in a browser). Adding a route means adding an entry there. `RoutePath` is typed from that JSON's keys, so a wrong path is a type error.
 
-`src/hooks/useNoIndex.ts` adds `robots: noindex, nofollow` for as long as a page is mounted and restores `index, follow` on unmount — used by `/admin` and `NotFound`. It has to be reversible because one `index.html` serves every route.
+`src/hooks/useNoIndex.ts` adds `robots: noindex, nofollow` for as long as a page is mounted and restores `index, follow` on unmount — used by `NotFound`. It has to be reversible because one `index.html` serves every route.
 
 All canonical and OG URLs use `https://www.artagers.design`. The apex 308-redirects to www, so naming the apex would point every canonical at a redirect.
 
@@ -81,13 +81,11 @@ All canonical and OG URLs use `https://www.artagers.design`. The apex 308-redire
 
 `src/lib/analytics.ts` exports `trackEvent`, a thin wrapper around `@vercel/analytics`'s `track()` with a closed `AnalyticsEvent` union (so a typo in an event name is a type error) and swallowed failures (an ad blocker must never break a user flow). Events: `cta_start_project` (every CTA routing to `/contact` — hero, navbar, mobile menu, footer strip, About; each passes a `location` prop), `brief_started`, `brief_submitted`, `telegram_click`, `verify_link_click`, `promptstation_click`, `hire_page_view`.
 
-GA4 (`G-YQ33QWSJ7C`) is loaded **by the GTM container** in `index.html`, not by its own snippet. Both were running at one point: 449 KB of analytics against a 202 KB app, with `gtag/js` fetched twice. Do not re-add a standalone gtag tag.
+GA4 (`G-YQ33QWSJ7C`) is loaded **directly** by the gtag snippet in `index.html`. There is no Google Tag Manager: the GTM container that used to load it (`GTM-MJHP7PC2`) never had a GA4 tag published, so GA recorded nothing for months. Do not route it back through GTM. SPA route changes are counted by GA4 enhanced measurement's history-change page views (on by default in the GA data stream settings). `scripts/prerender-bodies.mjs` aborts every Google analytics request, or each build would send one fake page view per route.
 
-### Admin Panel
+### Editing content
 
-`/admin` is a CMS at `src/pages/Admin.tsx`, gated by **Supabase Auth** (`signInWithPassword`). Login requires an email + password configured in the Supabase dashboard (Authentication → Users). Auth state is tracked via `onAuthStateChange` subscription (not a one-shot `getSession` call). It supports add/edit/delete/reorder for all three Supabase tables. The `/admin` link is hidden in the footer — not in the navbar.
-
-Cover images upload through `src/lib/uploadImage.ts` to a public Supabase Storage bucket (`covers`), so covers can be swapped without a redeploy. Uploads are downscaled to 2000px and re-encoded as JPEG at q0.82 in the browser before hitting the network. Reads are public, writes are authenticated-only — the anon key ships in the client bundle, so a write-open bucket would let anyone upload. The bucket + policy SQL is a comment block at the bottom of that file.
+There is **no admin panel** on the site — it was removed. Case studies, work experience and contact links are edited directly in the Supabase dashboard (Table Editor). Case-study covers may still point at the public Supabase Storage bucket (`covers`); upload replacements through the dashboard, and keep the bucket write-closed to the anon key — it ships in the client bundle.
 
 ### Contact Form & Serverless Function
 
@@ -100,7 +98,7 @@ The contact form in `src/pages/Contact.tsx` is a qualified project brief (name, 
 
 ### Form Fields
 
-Every control on the site uses one field system in `src/index.css`: a `.field` box wrapping a `.field-label` and a `.field-input` (plus `.field-select` for dropdowns, `.field-invalid` + `.field-error` for errors, and `.field-stack` to space a form's fields 8px apart). Both `Contact.tsx` and `Admin.tsx`'s `AdminField` render this markup — the classes exist because seven copies of the same Tailwind string had already drifted.
+Every control on the site uses one field system in `src/index.css`: a `.field` box wrapping a `.field-label` and a `.field-input` (plus `.field-select` for dropdowns, `.field-invalid` + `.field-error` for errors, and `.field-stack` to space a form's fields 8px apart). `Contact.tsx` renders this markup — the classes exist because seven copies of the same Tailwind string had already drifted.
 
 Four rules in that block are load-bearing, not cosmetic:
 
@@ -109,7 +107,7 @@ Four rules in that block are load-bearing, not cosmetic:
 - **`.field-input` is `font-size: 16px`.** Below 16px, iOS Safari zooms the whole page when a field takes focus.
 - **`:-webkit-autofill` is overridden twice over** — an inset box-shadow *and* an absurd `transition-delay` — because either alone has a hole. The `prefers-reduced-motion` block re-asserts the delay with `!important`; its blanket `transition-duration: 0.01ms` would otherwise hand reduced-motion users Chrome's autofill background.
 - Fonts: **Space Grotesk** (sans, body) and **Space Mono** (mono, labels/buttons) — loaded via Google Fonts in `index.html`
-- Color palette: near-black `#0a0a0a` on white `#ffffff`; accent yellow `#f5c842` used in the Admin warning banner
+- Color palette: near-black `#0a0a0a` on white `#ffffff`
 
 ### Homepage Sections
 
@@ -134,7 +132,7 @@ Copy `.env.example` → `.env`. The SQL schema to bootstrap the database is embe
 ## Static Files (`public/`)
 
 - `favicon.svg` — "AG" SVG favicon
-- `robots.txt` — disallows `/admin`, references sitemap
+- `robots.txt` — allows everything, references sitemap
 - `sitemap.xml` — lists `/`, `/work/telegram-mini-app-games`, `/contact`, `/hire`, `/about`
 - `llms.txt` — plain-text profile summary for AI crawlers (no JS required to read); must stay consistent with the data actually rendered by `src/hooks/useSupabaseData.ts`'s fallback arrays
 - `hero-portrait.webp` / `hero-portrait-sm.webp` — the LCP image pair preloaded via `routeMeta.json`
@@ -142,4 +140,4 @@ Copy `.env.example` → `.env`. The SQL schema to bootstrap the database is embe
 
 ## Stale Docs
 
-`STRUCTURE.md` predates the current architecture (it lists a `ProjectCard.tsx` that no longer exists and a hardcoded admin password that was replaced by Supabase Auth). `.claude/skills/verify/SKILL.md` still describes the removed singlefile build. Trust this file over both; fix them if you touch them.
+`STRUCTURE.md` predates the current architecture (it lists a `ProjectCard.tsx` that no longer exists). `.claude/skills/verify/SKILL.md` still describes the removed singlefile build. Trust this file over both; fix them if you touch them.
